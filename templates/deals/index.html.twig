@@ -3,46 +3,85 @@
 {% block title %}Browse Deals{% endblock %}
 
 {% block body %}
-{#    <div class="container px-5">#}
+{#<div class="container mt-5 d-flex justify-content-center ">#}
+{#    <div class="row border shadow-sm">#}
+{#        <div class="col-lg-auto d-flex justify-content-center align-items-lg-center">#}
+{#            <img src="https://picsum.photos/280" alt="">#}
+{#        </div>#}
+{#        <div class="col-lg-auto">#}
+{#            <div class="row mb-3">#}
+{#                <div class="col mt-3 ">#}
+{#                    <div class="btn-group" role="group" aria-label="Deal Score">#}
+{#                        <a type="button" class="btn btn-danger" href="#">+</a>#}
+{#                        <button type="button" class="btn btn-outline-primary" style="pointer-events: none;">Score</button>#}
+{#                        <a type="button" class="btn btn-primary" href="#">-</a>#}
+{#                    </div>#}
+{#                </div>#}
+{#                    <div class="col text-end my-auto">#}
+{#                        timestamp#}
+{#                    </div>#}
+{#            </div>#}
+{#            <div class="row mb-3">#}
+{#                <div class="col display-5">Title</div>#}
+{#            </div>#}
+{#            <div class="row mb-2">#}
+{#                <div class="col h3">#}
+{#                    <span class="text-danger">Price </span> <span class="text-secondary"><del>Price Before</del></span> <span class=""> discount </span> | <span class="text-warning">Seller</span>#}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="row mb-3">#}
+{#                <div class="col lead">Description</div>#}
+{#            </div>#}
+{#            <div class="row mb-3">#}
+{#                <div class="col">User</div>#}
+{#                <div class="col text-end">#}
+{#                    <a href="#" class="btn btn-warning">Go to Deal</a>#}
+{#                </div>#}
+{#            </div>#}
 
-<div class="container mt-5 d-flex justify-content-center">
-    <div class="row">
-        <div class="col-lg-auto d-flex justify-content-center align-items-lg-center">
-            <img src="https://picsum.photos/250" alt="">
-        </div>
-        <div class="col-lg-auto">
-            <div class="row mb-3">
-                <div class="col mt-3 mt-lg-0">
-                    <div class="btn-group" role="group" aria-label="Deal Score">
-                        <a type="button" class="btn btn-danger" href="#">+</a>
-                        <button type="button" class="btn btn-outline-primary" style="pointer-events: none;">Score</button>
-                        <a type="button" class="btn btn-primary" href="#">-</a>
-                    </div>
-                </div>
-                    <div class="col text-end my-auto">
-                        timestamp
-                    </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col display-5">Title</div>
-            </div>
-            <div class="row mb-2">
-                <div class="col h3">
-                    <span class="text-danger">Price </span> <span class="text-secondary"><del>Price Before</del></span> <span class=""> discount </span> | <span class="text-warning">Seller</span>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col lead">Description</div>
-            </div>
-            <div class="row mb-2">
-                <div class="col">User</div>
-                <div class="col text-end">
-                    <a href="#" class="btn btn-warning">Go to Deal</a>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
+{#        </div>#}
+{#    </div>#}
 {#</div>#}
+    {% for deal in deals %}
+        <div class="container mt-5 d-flex justify-content-center">
+            <div class="row border shadow-sm w-75 d-flex">
+                <div class="col-sm-auto col-mg-4 d-flex justify-content-center align-items-lg-center">
+                    <img src="https://picsum.photos/280" alt="">
+                </div>
+                <div class="col-sm-auto col-mg-auto flex-fill" >
+                    <div class="row mb-3">
+                        <div class="col mt-3 ">
+                            <div class="btn-group" role="group" aria-label="Deal Score">
+                                <a type="button" class="btn btn-danger" href="#">+</a>
+                                <button type="button" class="btn btn-outline-primary" style="pointer-events: none;">{{ deal.score }}</button>
+                                <a type="button" class="btn btn-primary" href="#">-</a>
+                            </div>
+                        </div>
+                        <div class="col text-end my-auto">
+                            {{ deal.createdAt|ago }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col display-5">{{ deal.title }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col h3 d-flex gap-3 align-items-end">
+                            <span class="text-danger h2">{{ deal.price }}PLN </span> <span class="text-secondary h4"><del>{{ deal.priceBefore }}PLN</del></span> <span class="h4"> {{ (-1+deal.price/deal.priceBefore)|number_format(2)  }}% </span> <span class="text-warning h4">{{ deal.seller }}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col lead">{{ deal.description }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">User</div>
+                        <div class="col text-end">
+                            <a href="#" class="btn btn-warning">Go to Deal</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
 {% endblock %}
