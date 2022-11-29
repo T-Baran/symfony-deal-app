@@ -62,18 +62,18 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col display-5">{{ deal.title }}</div>
+                        <div class="col display-5"><a class="text-decoration-none" href="{{ path('deal_show', {'id' : deal.id}) }}"> {{ deal.title }} </a></div>
                     </div>
                     <div class="row mb-2">
                         <div class="col h3 d-flex gap-3 align-items-end">
-                            <span class="text-danger h2">{{ deal.price }}PLN </span> <span class="text-secondary h4"><del>{{ deal.priceBefore }}PLN</del></span> <span class="h4"> {{ (-1+deal.price/deal.priceBefore)|number_format(2)  }}% </span> <span class="text-warning h4">{{ deal.seller }}</span>
+                            <span class="text-danger h2">{{ deal.price }}PLN </span> <span class="text-secondary h4"><del>{{ deal.priceBefore }}PLN</del></span> <span class="h4"> {{ ((-1+deal.price/deal.priceBefore)|number_format(2))*100  }}% </span> <span class="text-warning h4">{{ deal.seller }}</span>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col lead">{{ deal.description }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col">User</div>
+                        <div class="col">{{ deal.user.username }}</div>
                         <div class="col text-end">
                             <a href="#" class="btn btn-warning">Go to Deal</a>
                         </div>

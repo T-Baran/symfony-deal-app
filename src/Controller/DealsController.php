@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 
 class DealsController extends AbstractController
 {
@@ -23,7 +24,7 @@ class DealsController extends AbstractController
     }
 
     #[Route('/create', name:'deal_create')]
-    public function create(EntityManagerInterface $em, Request $request): Response
+    public function create(EntityManagerInterface $em, Request $request, Security $security): Response
     {
         $deal = new Deal();
         $form = $this->createForm(DealType::class, $deal);
@@ -31,6 +32,7 @@ class DealsController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid()){
             $deal->setScore(0);
+            $deal->setUser($security->getUser());
             $em->persist($deal);
             $em->flush();
 
@@ -40,4 +42,29 @@ class DealsController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/edit/{id}', name:'deal_edit')]
+    public function edit( EntityManagerInterface $em, Deal $deal, Request $request): Response
+    {
+        $form = $this->createForm(DealType::class, $deal);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $em->persist($deal);
+            $em->flush();
+
+            return $this->redirectToRoute('deals');
+        }
+        return $this->renderForm('deals/edit.html.twig',[
+            'form' => $form,
+        ]);
+    }
+    #[Route('/show/{id}', name:'deal_show')]
+    public function show(Deal $deal): Response
+    {
+        return $this->render('deals/show.html.twig',[
+            'deal' => $deal,
+        ]);
+    }
+
 }

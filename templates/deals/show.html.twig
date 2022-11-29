@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Browse Deals{% endblock %}
+
+{% block body %}
+
+
+        <div class="container mt-5 d-flex justify-content-center">
+            <div class="row border shadow-sm w-75 d-flex">
+                <div class="col-sm-auto col-mg-4 d-flex justify-content-center align-items-lg-center">
+                    <img src="https://picsum.photos/280" alt="">
+                </div>
+                <div class="col-sm-auto col-mg-auto flex-fill" >
+                    <div class="row mb-3">
+                        <div class="col mt-3 ">
+                            <div class="btn-group" role="group" aria-label="Deal Score">
+                                <a type="button" class="btn btn-danger" href="#">+</a>
+                                <button type="button" class="btn btn-outline-primary" style="pointer-events: none;">{{ deal.score }}</button>
+                                <a type="button" class="btn btn-primary" href="#">-</a>
+                            </div>
+                        </div>
+                        <div class="col text-end my-auto">
+                            {{ deal.createdAt|ago }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col display-5"><a class="text-decoration-none" href="{{ path('deal_edit', {'id' : deal.id}) }}"> {{ deal.title }} </a></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col h3 d-flex flex-wrap gap-3 align-items-end">
+                            <span class="text-danger h2">{{ deal.price }}PLN </span>
+                            <span class="text-secondary h4"><del>{{ deal.priceBefore }}PLN</del></span>
+                            <span class="h4"> {{ ((-1+deal.price/deal.priceBefore)|number_format(2))*100  }}% </span>
+                            <span class="text-warning h4">{{ deal.seller }}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col lead">{{ deal.description }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">{{ deal.user.username }}</div>
+{#                        <div class="col text-end">#}
+{#                            <a href="#" class="btn btn-warning">Go to Deal</a>#}
+{#                        </div>#}
+                    </div>
+                </div>
+
+
+                    <div class="row mt-4 mx-auto">
+                        <p class="display-4 mb-4">Comments</p>
+                        <div class="px-3">
+                            <div class="pl-2 row pb-3">
+                                <div class="text-primary col">Username</div>
+                                <div class="col text-end">Date</div>
+                            </div>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium aliquam consequuntur culpa cumque dolorem earum exercitationem illo illum inventore magni necessitatibus nobis provident reiciendis, sed soluta sunt ullam veritatis vitae. Adipisci alias architecto commodi culpa cumque dolor dolore doloremque eligendi explicabo hic illum itaque maiores mollitia natus nemo non obcaecati odit quae quidem quisquam quos recusandae rerum, tempora ut vel veniam voluptatem? Ab alias architecto aut beatae blanditiis, commodi consequuntur corporis ducimus eaque eius esse est eum excepturi, fugit hic id iste iure labore laborum libero minus modi nulla quam quo sapiente similique sit tempora tempore temporibus totam ullam velit.</p>
+                        </div>
+                        <div class="px-3" x-data="{ open: false }">
+                            <button x-show="!open" class="btn btn-success mb-3 px-2 mx-auto" @click="open = ! open">Show Comment Field</button>
+                            <form x-show="open" action="">
+                                <div class="form-group d-flex gap-3 flex-column">
+                                    <label for="comment">Your comment:</label>
+                                    <input type="text" class="form-control" id="comment" >
+                                    <button class="btn btn-success">Add</button>
+                                </div>
+                            </form>
+                        </div>
+
+
+                    </div>
+
+
+            </div>
+        </div>
+
+
+
+{% endblock %}

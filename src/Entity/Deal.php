@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\DealRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
@@ -35,6 +37,18 @@ class Deal
 
     #[ORM\Column]
     private ?int $score = null;
+
+    #[ORM\ManyToOne(inversedBy: 'deals')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $User = null;
+
+    #[ORM\OneToMany(mappedBy: 'deal', targetEntity: Comment::class)]
+    private Collection $comments;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -109,6 +123,48 @@ class Deal
     public function setScore(int $score): self
     {
         $this->score = $score;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->User;
+    }
+
+    public function setUser(?User $User): self
+    {
+        $this->User = $User;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setDeal($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getDeal() === $this) {
+                $comment->setDeal(null);
+            }
+        }
 
         return $this;
     }
