@@ -4,113 +4,122 @@
 
 {% block body %}
 {#justify-content-center align-items-lg-center col-mg-auto#}
-
-        <div class="container mt-5 d-flex justify-content-center">
-            <div class="row border shadow-sm w-75 d-flex">
-                <div class="col-sm-auto  d-flex flex-column gap-4 flex-fill  ">
-                    <img src="https://picsum.photos/280" alt="">
-                    <div class="d-flex gap-5">
-                        {% if is_granted('EDIT', deal) %}
-                            <a href="{{ path('deal_edit', {id: deal.id}) }}" class="btn btn-sm btn-info w-100">Edit</a>
-                        {% endif %}
-                        {% if is_granted('DELETE', deal) %}
-                            <form action="{{ url('deal_delete', {id:deal.id}) }}" method="post" class="w-100">
-                                <button type="submit" class="btn btn-sm btn-danger w-100 ">Delete</button>
+    <div class="container mt-5 d-flex justify-content-center">
+        <div class="row border shadow-sm w-75 d-flex">
+            <div class="col-sm-auto  d-flex flex-column gap-4 flex-fill  ">
+                <img src="https://picsum.photos/280" alt="">
+                <div class="d-flex gap-5">
+                    {% if is_granted('EDIT', deal) %}
+                        <a href="{{ path('deal_edit', {id: deal.id}) }}" class="btn btn-sm btn-info w-100">Edit</a>
+                    {% endif %}
+                    {% if is_granted('DELETE', deal) %}
+                        <form action="{{ url('deal_delete', {id:deal.id}) }}" method="post" class="w-100">
+                            <button type="submit" class="btn btn-sm btn-danger w-100 ">Delete</button>
+                            <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-sm-auto col-md-5 flex-fill" >
+                <div class="row mb-3">
+                    <div class="col mt-3 ">
+                        <div class="btn-group" role="group" aria-label="Deal Score">
+                            <form action="{{ url('up_vote', {id: deal.id}) }}" method="POST">
+                                <button type="submit" class="btn btn-danger" >+</button>
+                                <input type="hidden" name="referer" value="{{ app.request.uri }}">
                             </form>
-                        {% endif %}
+                            <button type="button" class="btn btn-outline-primary" style="pointer-events: none;">{{ deal.score }}</button>
+                            <form action="{{ url('down_vote', {id: deal.id}) }}" method="POST">
+                                <button type="submit" class="btn btn-primary">-</button>
+                                <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col text-end my-auto">
+
+                        {{ deal.createdAt|ago }}
                     </div>
                 </div>
-                <div class="col-sm-auto col-md-5 flex-fill" >
-                    <div class="row mb-3">
-                        <div class="col mt-3 ">
-                            <div class="btn-group" role="group" aria-label="Deal Score">
-                                <a type="button" class="btn btn-danger" href="#">+</a>
-                                <button type="button" class="btn btn-outline-primary" style="pointer-events: none;">{{ deal.score }}</button>
-                                <a type="button" class="btn btn-primary" href="#">-</a>
-                            </div>
-                        </div>
-
-                        <div class="col text-end my-auto">
-
-                            {{ deal.createdAt|ago }}
-                        </div>
+                <div class="row mb-3">
+                    <div class="col display-5"> {{ deal.title }} </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col h3 d-flex flex-wrap gap-3 align-items-end">
+                        <span class="text-danger h2">{{ deal.price }}PLN </span>
+                        <span class="text-secondary h4"><del>{{ deal.priceBefore }}PLN</del></span>
+                        <span class="h4"> {{ ((-1+deal.price/deal.priceBefore)|number_format(2))*100  }}% </span>
+                        <span class="text-warning h4">{{ deal.seller }}</span>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col display-5"> {{ deal.title }} </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col lead text-wrap text-break">{{ deal.description }}</div>
+                </div>
+                <div class="row mb-3 d-flex justify-start align-center">
+                    <div class="col d-flex gap-3 align-items-center">
+                        <img style="height: 30px;width: 30px; border-radius: 25%;" class="" src="{{ deal.user.avatarUrl }}" alt="avatar">
+                        <div style="height: 30px;"  class="h4 mb-0">{{ deal.user.username }}</div>
+                        {% if app.user is same as (deal.user) %}
+                            <span class="badge bg-info">You</span>
+                        {% endif %}
                     </div>
-                    <div class="row mb-2">
-                        <div class="col h3 d-flex flex-wrap gap-3 align-items-end">
-                            <span class="text-danger h2">{{ deal.price }}PLN </span>
-                            <span class="text-secondary h4"><del>{{ deal.priceBefore }}PLN</del></span>
-                            <span class="h4"> {{ ((-1+deal.price/deal.priceBefore)|number_format(2))*100  }}% </span>
-                            <span class="text-warning h4">{{ deal.seller }}</span>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col lead text-wrap text-break">{{ deal.description }}</div>
-                    </div>
-                    <div class="row mb-3 d-flex justify-start align-center">
-                        <div class="col d-flex gap-3 align-items-center">
-                            <img style="height: 30px;width: 30px; border-radius: 25%;" class="" src="{{ deal.user.avatarUrl }}" alt="avatar">
-                            <div style="height: 30px;"  class="h4 mb-0">{{ deal.user.username }}</div>
-                            {% if app.user is same as (deal.user) %}
-                                <span class="badge bg-info">You</span>
-                            {% endif %}
-                        </div>
 {#                        <div class="col text-end">#}
 {#                            <a href="#" class="btn btn-warning">Go to Deal</a>#}
 {#                        </div>#}
+                </div>
+            </div>
+
+
+                <div class="row mt-4 mx-auto">
+                    <p class="display-4 mb-4">Comments</p>
+                    {% for comment in comments %}
+                    <div class="px-3" x-data="{ edit:false }">
+                        <div class="pl-2 row pb-3">
+                            <div style="height: fit-content" class="text-primary col d-flex gap-3 align-items-center">
+                                <img style="height: 30px;width: 30px; border-radius: 25%;" class="" src="{{ deal.user.avatarUrl }}" alt="avatar">
+                                <p class="h4 my-auto">{{ comment.user.username }}</p>
+                                {% if app.user is same as (comment.user) %}
+                                    <span class="badge bg-info">You</span>
+                                {% endif %}
+                                {% if is_granted('EDIT', comment) %}
+                                    <button class="badge bg-warning border-0" @click="edit = true">Edit</button>
+                                {% endif %}
+                                {% if is_granted('DELETE', comment) %}
+                                    <form action="{{ url('comment_delete', { id: comment.id,  }) }}" method="POST"  class="d-flex align-items-center">
+                                        <button type="submit" class="badge bg-danger border-0">Delete</button>
+                                        <input type="hidden" name="token" value="{{ csrf_token('delete-comment') }}">
+                                        <input x-show="edit" type="hidden" name="referer" value="{{ app.request.uri }}">
+                                    </form>
+                                {% endif %}
+                            </div>
+                            <div class="col text-end">{{ comment.createdAt|ago }}</div>
+                        </div>
+                        <p class="p-3" x-show="!edit" >{{ comment.content }} </p>
+                        <form action="{{ url('comment_edit', { id: comment.id,  }) }}" method="POST" x-show="edit" class="d-flex flex-column gap-2 ">
+                            <input x-show="edit" type="text" name="content" value="{{ comment.content }}" >
+                            <input x-show="edit" type="hidden" name="token" value="{{ csrf_token('edit-comment') }}"/>
+                            <input x-show="edit" type="hidden" name="referer" value="{{ app.request.uri }}">
+                            <button x-show="edit" class="btn btn-success mb-5">Update</button>
+                        </form>
                     </div>
+                    {% endfor %}
+                    <div class="px-3" x-data="{ open: false }">
+                        <button x-show="!open" class="btn btn-success mb-3 px-2 mx-auto" @click="open = true">Show Comment Field</button>
+                        <form x-show="open" action="{{ url('comment_create', { id: deal.id }) }}" method="post">
+                            <div class="form-group d-flex gap-3 flex-column mb-4">
+                                <label for="comment">Your comment:</label>
+                                <input type="text" name="content" class="form-control" id="comment" >
+                                <input type="hidden" name="token" value="{{ csrf_token('create-comment') }}"/>
+                                <button class="btn btn-success">Add</button>
+                            </div>
+                        </form>
+                    </div>
+
+
                 </div>
 
 
-                    <div class="row mt-4 mx-auto">
-                        <p class="display-4 mb-4">Comments</p>
-                        {% for comment in comments %}
-                        <div class="px-3" x-data="{ edit:false }">
-                            <div class="pl-2 row pb-3">
-                                <div style="height: fit-content" class="text-primary col d-flex gap-3 align-items-center">
-                                    <img style="height: 30px;width: 30px; border-radius: 25%;" class="" src="{{ deal.user.avatarUrl }}" alt="avatar">
-                                    <p class="h4 my-auto">{{ comment.user.username }}</p>
-                                    {% if app.user is same as (comment.user) %}
-                                        <span class="badge bg-info">You</span>
-                                    {% endif %}
-                                    {% if is_granted('EDIT', comment) %}
-                                        <button class="badge bg-warning border-0" @click="edit = true">Edit</button>
-                                    {% endif %}
-                                    {% if is_granted('DELETE', comment) %}
-                                        <form action="{{ url('comment_delete', { id: comment.id,  }) }}" method="POST"  class="d-flex align-items-center">
-                                            <button type="submit" class="badge bg-danger border-0">Delete</button>
-                                        </form>
-                                    {% endif %}
-                                </div>
-                                <div class="col text-end">{{ comment.createdAt|ago }}</div>
-                            </div>
-                            <p class="p-3" x-show="!edit" >{{ comment.content }} </p>
-                            <form action="{{ url('comment_edit', { id: comment.id,  }) }}" method="POST" x-show="edit" class="d-flex flex-column gap-2 ">
-                                <input x-show="edit" type="text" name="content" value="{{ comment.content }}" >
-                                <input x-show="edit" type="hidden" name="token" value="{{ csrf_token('edit-comment') }}"/>
-                                <button x-show="edit" class="btn btn-success mb-5">Update</button>
-                            </form>
-                        </div>
-                        {% endfor %}
-                        <div class="px-3" x-data="{ open: false }">
-                            <button x-show="!open" class="btn btn-success mb-3 px-2 mx-auto" @click="open = true">Show Comment Field</button>
-                            <form x-show="open" action="{{ url('comment_create', { id: deal.id }) }}" method="post">
-                                <div class="form-group d-flex gap-3 flex-column mb-4">
-                                    <label for="comment">Your comment:</label>
-                                    <input type="text" name="content" class="form-control" id="comment" >
-                                    <input type="hidden" name="token" value="{{ csrf_token('create-comment') }}"/>
-                                    <button class="btn btn-success">Add</button>
-                                </div>
-                            </form>
-                        </div>
-
-
-                    </div>
-
-
-            </div>
         </div>
+    </div>
 
 {% endblock %}

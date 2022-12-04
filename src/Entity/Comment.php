@@ -25,7 +25,8 @@ class Comment
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'deal', referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
+
     private ?Deal $deal = null;
 
     public function getId(): ?int

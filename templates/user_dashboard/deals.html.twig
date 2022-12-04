@@ -1,6 +1,7 @@
 {% extends 'user_dashboard/index.html.twig' %}
 {% block table %}
     <table class="table table-hover">
+
         <thead>
         <tr>
             <th scope="col">#</th>
@@ -28,6 +29,7 @@
             <td>
                 <form action="{{ url('deal_delete', {id:deal.id}) }}" method="post" class="">
                     <button type="submit" class="btn btn-danger">Delete</button>
+                    <input type="hidden" name="referer" value="{{ app.request.uri }}">
                 </form>
             </td>
         </tr>

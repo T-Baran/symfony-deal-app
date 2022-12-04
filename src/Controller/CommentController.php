@@ -27,9 +27,8 @@ class CommentController extends AbstractController
             $em->persist($comment);
             $deal->addComment($comment);
             $em->persist($deal);
-
             $em->flush();
-
+            $this->addFlash('success', 'Comment added');
             return $this->redirectToRoute('deal_show',[
                 'id' => $id,
             ]);
@@ -41,31 +40,29 @@ class CommentController extends AbstractController
     public function edit ($id, Request $request, Comment $comment, EntityManagerInterface $em)
     {
         $this->denyAccessUnlessGranted('EDIT', $comment);
-
         $submittedToken = $request->request->get('token');
-//        dd($this->isCsrfTokenValid('edit-comment', $submittedToken));
+        //        dd($this->isCsrfTokenValid('edit-comment', $submittedToken));
         if ($this->isCsrfTokenValid('edit-comment', $submittedToken)) {
             $comment->setContent($request->request->get('content'));
             $em->persist($comment);
             $em->flush();
-//            return $this->redirectToRoute('deal_show',[
-//                'id' => $id,
-//            ]);
+            $this->addFlash('success', 'Comment updated');
         }
-        return $this->redirectToRoute('deal_show',[
-            'id' => $comment->getDeal()->getId(),
-        ]);
+        return $this->redirect($request->request->get('referer'));
 
     }
 
     #[Route('/comment/delete/{id}', name: 'comment_delete', methods: ['POST'])]
-    public function delete(Comment $comment, EntityManagerInterface $em): Response
+    public function delete(Comment $comment, EntityManagerInterface $em, Request $request): Response
     {
+//        dd($request->request->get('referer'));
         $this->denyAccessUnlessGranted('DELETE', $comment);
-        $em->remove($comment);
-        $em->flush();
-        return $this->redirectToRoute('deal_show',[
-            'id'=>$comment->getDeal()->getId(),
-        ]);
+        $submittedToken = $request->request->get('token');
+        if($this->isCsrfTokenValid('delete-comment', $submittedToken)){
+            $em->remove($comment);
+            $em->flush();
+            $this->addFlash('success', 'Comment deleted');
+        }
+        return $this->redirect($request->request->get('referer'));
     }
 }

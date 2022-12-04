@@ -3,11 +3,12 @@
 {% block title %}Browse Deals{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-    <h1 class="mb-3">Modify a Deal</h1>
+     <div class="container mt-5">
+         <h1 class="mb-3">Modify a Deal</h1>
         {{ form_start(form) }}
         {{ form_widget(form) }}
         <button type="submit" class="btn btn-success">Update</button>
+        <input type="hidden" name="referer" value="{{app.request.headers.get('referer')|default('/')}}"/>
         {{ form_end(form) }}
     </div>
 

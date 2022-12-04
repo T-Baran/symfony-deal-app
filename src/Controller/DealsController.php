@@ -38,6 +38,7 @@ class DealsController extends AbstractController
             $deal->setUser($security->getUser());
             $em->persist($deal);
             $em->flush();
+            $this->addFlash('success', 'Deal created');
             return $this->redirectToRoute('deals');
         }
         return $this->renderForm('deals/create.html.twig',[
@@ -48,21 +49,14 @@ class DealsController extends AbstractController
     #[Route('/edit/{id}', name:'deal_edit')]
     public function edit( EntityManagerInterface $em, Deal $deal, Request $request): Response
     {
-//        dd($request->getSession());
-//        $url = $this->getTargetPath($request->getSession(), 'main');
-//        if(!$url){
-//            $url = $this->generateUrl('deals');
-//        }
         $this->denyAccessUnlessGranted('EDIT', $deal);
         $form = $this->createForm(DealType::class, $deal);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $em->persist($deal);
             $em->flush();
-//            return $this->redirect($url);
-            return $this->redirectToRoute('deal_show',[
-                'id'=>$deal->getId(),
-            ]);
+            $this->addFlash('success', 'Deal updated');
+            return $this->redirect($request->request->get('referer'));
         }
         return $this->renderForm('deals/edit.html.twig',[
             'form' => $form,
@@ -78,12 +72,31 @@ class DealsController extends AbstractController
         ]);
     }
     #[Route('/delete/{id}', name:'deal_delete', methods: ['POST'])]
-    public function delete(Deal $deal, EntityManagerInterface $em): Response
+    public function delete(Deal $deal, EntityManagerInterface $em, Request $request): Response
     {
         $this->denyAccessUnlessGranted('DELETE', $deal);
+//        dd($request->request->get('referer'));
         $em->remove($deal);
         $em->flush();
-        return $this->redirect('/');
+        $this->addFlash('success', 'Deal deleted');
+        if(str_contains($request->request->get('referer'), 'show')) {
+            return $this->redirect('/');
+             }
+        return $this->redirect($request->request->get('referer'));
+    }
+    #[Route('/up/{id}', name:'up_vote', methods: 'POST')]
+    public function upVote(Deal $deal, EntityManagerInterface $em, Request $request): Response
+    {
+        $deal->setScore($deal->getScore()+1);
+        $em->flush();
+        return $this->redirect($request->request->get('referer'));
+    }
+    #[Route('/down/{id}', name:'down_vote', methods: 'POST')]
+    public function downVote(Deal $deal, EntityManagerInterface $em, Request $request): Response
+    {
+        $deal->setScore($deal->getScore()-1);
+        $em->flush();
+        return $this->redirect($request->request->get('referer'));
     }
 
 
