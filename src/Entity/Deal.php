@@ -40,7 +40,7 @@ class Deal
 
     #[ORM\ManyToOne(inversedBy: 'deals')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $User = null;
+    private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'deal', targetEntity: Comment::class)]
     private Collection $comments;
@@ -129,12 +129,12 @@ class Deal
 
     public function getUser(): ?User
     {
-        return $this->User;
+        return $this->user;
     }
 
     public function setUser(?User $User): self
     {
-        $this->User = $User;
+        $this->user = $User;
 
         return $this;
     }

@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Config\TwigExtra\StringConfig;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
@@ -31,7 +32,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToMany(mappedBy: 'User', targetEntity: Deal::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Deal::class)]
     private Collection $deals;
 
     #[ORM\Column(length: 255)]
@@ -187,4 +188,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getAvatarUrl(): String
+    {
+        return "https://avatars.dicebear.com/api/avataaars/".$this->username.".svg";
+    }
+
 }

@@ -45,10 +45,10 @@
     {% for deal in deals %}
         <div class="container mt-5 d-flex justify-content-center">
             <div class="row border shadow-sm w-75 d-flex">
-                <div class="col-sm-auto col-mg-4 d-flex justify-content-center align-items-lg-center">
+                <div class="col-sm-auto col-mg-4 mx-auto d-flex justify-content-center align-items-center">
                     <img src="https://picsum.photos/280" alt="">
                 </div>
-                <div class="col-sm-auto col-mg-auto flex-fill" >
+                <div class="col-sm-auto col-md-5 flex-fill" >
                     <div class="row mb-3">
                         <div class="col mt-3 ">
                             <div class="btn-group" role="group" aria-label="Deal Score">
@@ -62,7 +62,7 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col display-5"><a class="text-decoration-none" href="{{ path('deal_show', {'id' : deal.id}) }}"> {{ deal.title }} </a></div>
+                        <div class="col display-5"> {{ deal.title }} </div>
                     </div>
                     <div class="row mb-2">
                         <div class="col h3 d-flex gap-3 align-items-end">
@@ -70,12 +70,18 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col lead">{{ deal.description }}</div>
+                        <div class="col lead text-wrap text-break">{{ deal.description }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col">{{ deal.user.username }}</div>
+                        <div class="col d-flex align-items-center gap-2">
+                            <img style="height: 30px;width: 30px; border-radius: 25%;" class="" src="{{ deal.user.avatarUrl }}" alt="avatar">
+                            <div style="height: 30px;"  class="h4 mb-0">{{ deal.user.username }}</div>
+                            {% if app.user is same as (deal.user) %}
+                                <span class="badge bg-info">You</span>
+                            {% endif %}
+                        </div>
                         <div class="col text-end">
-                            <a href="#" class="btn btn-warning">Go to Deal</a>
+                            <a href="{{ path('deal_show', {'id' : deal.id}) }}" class="btn btn-warning">Go to Deal</a>
                         </div>
                     </div>
 
