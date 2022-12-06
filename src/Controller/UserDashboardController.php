@@ -30,7 +30,7 @@ class UserDashboardController extends AbstractController
             'deals'=>$deals,
         ]);
     }
-    #[Route('/comments',name:'user_dashboard_comments')]
+    #[Route('/comments', name:'user_dashboard_comments')]
     public function comments(CommentRepository $commentRepository, UserInterface $user): Response
     {
         $comments = $commentRepository->findBy([

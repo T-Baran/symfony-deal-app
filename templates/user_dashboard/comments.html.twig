@@ -15,7 +15,7 @@
         {% for comment in comments %}
         <tr x-data="{ edit:false }">
             <th scope="row">{{ loop.index }}</th>
-            <td><a href="{{ path('') }}">{{ comment.deal.title }}</a></td>
+            <td><a href="#">{{ comment.deal.title }}</a></td>
             <td class="w-50">
                 <p x-show="!edit" class="text-wrap text-break w-100">{{ comment.content }}</p>
                 <form action="{{ url('comment_edit', { id: comment.id,  }) }}" method="POST" x-show="edit" class="d-flex gap-2 w-100">

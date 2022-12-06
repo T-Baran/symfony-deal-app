@@ -41,6 +41,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Comment::class)]
     private Collection $comments;
 
+    private $plainPassword;
+
+
     public function __construct()
     {
         $this->deals = new ArrayCollection();
@@ -114,7 +117,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+         $this->plainPassword = null;
     }
 
     /**
@@ -192,6 +195,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getAvatarUrl(): String
     {
         return "https://avatars.dicebear.com/api/avataaars/".$this->username.".svg";
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPlainPassword()
+    {
+        return $this->plainPassword;
+    }
+
+    /**
+     * @param mixed $plainPassword
+     */
+    public function setPlainPassword($plainPassword): void
+    {
+        $this->plainPassword = $plainPassword;
     }
 
 }
