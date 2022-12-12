@@ -1,0 +1,45 @@
+{% extends 'admin_dashboard/index.html.twig' %}
+{% block table %}
+    <table class="table table-hover">
+
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Price</th>
+            <th scope="col">Price before</th>
+            <th scope="col">Seller</th>
+            <th scope="col">Description</th>
+            <th scope="col">Date</th>
+            <th scope="col">User</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for deal in deals %}
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ deal.title }}</td>
+            <td>{{ deal.price }}</td>
+            <td>{{ deal.priceBefore }}</td>
+            <td>{{ deal.seller }}</td>
+            <td class="text-wrap text-break">{{ deal.description }}</td>
+            <td>{{ deal.createdAt|ago }}</td>
+            <td>{{ deal.user.username }}</td>
+            <td><a href="{{ path('deal_edit', {id: deal.id}) }}" class="btn btn-warning">Edit</a></td>
+            {% if is_granted('DELETE', deal) %}
+                <td>
+                    <form action="{{ url('deal_delete', {id:deal.id}) }}" method="post" class="">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                    </form>
+                </td>
+            {% else %}
+                <td></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

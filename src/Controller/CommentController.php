@@ -32,8 +32,10 @@ class CommentController extends AbstractController
             return $this->redirectToRoute('deal_show',[
                 'id' => $id,
             ]);
+        }else{
+        $this->addFlash('failure', "Please try again later");
+        return $this->redirect($request->request->get('referer'));
         }
-        return new Exception('Wrong CSRF Token');
 
     }
     #[Route('/comment/edit/{id}', name:'comment_edit', methods: ['POST'])]
@@ -47,6 +49,8 @@ class CommentController extends AbstractController
             $em->persist($comment);
             $em->flush();
             $this->addFlash('success', 'Comment updated');
+        }else{
+        $this->addFlash('failure', "Please try again later");
         }
         return $this->redirect($request->request->get('referer'));
 
@@ -62,6 +66,8 @@ class CommentController extends AbstractController
             $em->remove($comment);
             $em->flush();
             $this->addFlash('success', 'Comment deleted');
+        }else{
+        $this->addFlash('failure', "Please try again later");
         }
         return $this->redirect($request->request->get('referer'));
     }

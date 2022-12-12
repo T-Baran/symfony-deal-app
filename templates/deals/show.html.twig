@@ -110,6 +110,7 @@
                                 <label for="comment">Your comment:</label>
                                 <input type="text" name="content" class="form-control" id="comment" >
                                 <input type="hidden" name="token" value="{{ csrf_token('create-comment') }}"/>
+                                <input type="hidden" name="referer" value="{{ app.request.uri }}">
                                 <button class="btn btn-success">Add</button>
                             </div>
                         </form>

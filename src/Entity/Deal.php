@@ -39,7 +39,7 @@ class Deal
     private ?int $score = null;
 
     #[ORM\ManyToOne(inversedBy: 'deals')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'user', referencedColumnName:'id', nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'deal', targetEntity: Comment::class)]

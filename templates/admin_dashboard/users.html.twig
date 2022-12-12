@@ -1,0 +1,61 @@
+{% extends 'admin_dashboard/index.html.twig' %}
+{% block table %}
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
+            <th scope="col">Edit Role</th>
+            <th scope="col">Delete</th>
+        </tr>
+        </thead>
+        <tbody >
+        {% for user in users %}
+        <tr x-data="{ edit:false }">
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <div class="" x-show="!edit">
+                    {% for role in user.roles %}
+                        {{ role == 'ROLE_USER'? "":role }}
+                    {% endfor %}
+                </div>
+                <div class="" x-show="edit">
+                    <form action="{{ url('user_role', { id: user.id,  }) }}" method="post">
+                        <select name="ROLE" onchange="this.form.submit();" >
+                            <option value="" selected disabled>Select Role</option>
+                            <option value="ROLE_ADMIN" >Admin</option>
+                            <option value="ROLE_EDITOR">Editor</option>
+                            <option value="ROLE_USER">User</option>
+                        </select>
+                            <input x-show="edit" type="hidden" name="token" value="{{ csrf_token('edit-role-user') }}"/>
+                            <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                    </form>
+                </div>
+            </td>
+            {% if is_granted('ROLE_SUPER_ADMIN') %}
+                <td @click="edit = !edit">
+                    <button class="btn btn-warning">Edit Role</button>
+                </td>
+            {% else %}
+                <td></td>
+            {% endif %}
+            {% if is_granted('ROLE_SUPER_ADMIN') %}
+                <td>
+                    <form action="{{ url('user_delete', {id:user.id}) }}" method="post" class="">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                        <input type="hidden" name="token" value="{{ csrf_token('delete-user')  }}">
+                    </form>
+                </td>
+            {% else %}
+                <td></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

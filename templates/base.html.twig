@@ -33,9 +33,9 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    {% if is_granted('ROLE_ADMIN') %}
+                    {% if is_granted('ROLE_EDITOR') %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ path('user_dashboard') }}">Admin Dashboard</a>
+                            <a class="nav-link" href="{{ path('admin_dashboard') }}">Admin Dashboard</a>
                         </li>
                     {% endif %}
                     {% if is_granted('ROLE_USER') %}
@@ -47,11 +47,6 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">My account</a>
-                    </li>
-
-                    {% elseif is_granted('ROLE_ADMIN') %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Admin Panel</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
@@ -68,6 +63,9 @@
     </nav>
     {% for message in app.flashes('success') %}
         <div class="alert alert-success text-center h5">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('failure') %}
+        <div class="alert alert-danger text-center h5">{{ message }}</div>
     {% endfor %}
         {% block body %}{% endblock %}
     </body>

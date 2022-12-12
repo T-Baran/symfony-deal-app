@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block body %}
+    <div class="container d-flex flex-column align-items-center mt-4 gap-4">
+        <h1>Admin Dashboard</h1>
+        <div class="d-flex gap-4">
+            <a href="{{ path('admin_dashboard_deals') }}" class="btn btn-success">Deals</a>
+            <a href="{{ path('admin_dashboard_comments') }}" class="btn btn-success">Comments</a>
+            <a href="{{ path('admin_dashboard_users') }}" class="btn btn-success">Users</a>
+        </div>
+
+        {% block table %}
+        {% endblock %}
+
+    </div>
+{% endblock %}

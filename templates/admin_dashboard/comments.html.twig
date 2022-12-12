@@ -1,4 +1,4 @@
-{% extends 'user_dashboard/index.html.twig' %}
+{% extends 'admin_dashboard/index.html.twig' %}
 {% block table %}
     <table class="table table-hover">
         <thead>
@@ -6,7 +6,8 @@
             <th scope="col">#</th>
             <th scope="col">Deal Name</th>
             <th scope="col">Comment Content</th>
-            <th scope="col">Created</th>
+            <th scope="col">Date</th>
+            <th scope="col">User</th>
             <th scope="col">Edit</th>
             <th scope="col">Delete</th>
         </tr>
@@ -21,21 +22,26 @@
                 <form action="{{ url('comment_edit', { id: comment.id,  }) }}" method="POST" x-show="edit" class="d-flex gap-2 w-100">
                     <input x-show="edit" type="text" name="content" value="{{ comment.content }}" class="w-75" >
                     <input x-show="edit" type="hidden" name="token" value="{{ csrf_token('edit-comment') }}"/>
-                    <button x-show="edit" class="btn btn-success w-25">Update</button>
                     <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                    <button x-show="edit" class="btn btn-success w-25">Update</button>
                 </form>
             </td>
             <td>{{ comment.createdAt|ago }}</td>
+            <td>{{ comment.user.username }}</td>
             <td @click="edit = true">
                 <button class="btn btn-warning">Edit</button>
             </td>
-            <td>
-                <form action="{{ url('comment_delete', {id:comment.id}) }}" method="post" class="">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                    <input type="hidden" name="referer" value="{{ app.request.uri }}">
-                    <input type="hidden" name="token" value="{{ csrf_token('delete-comment')  }}">
-                </form>
-            </td>
+            {% if is_granted('DELETE',comment) %}
+                <td>
+                    <form action="{{ url('comment_delete', {id:comment.id}) }}" method="post" class="">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                        <input type="hidden" name="token" value="{{ csrf_token('delete-comment')  }}">
+                    </form>
+                </td>
+            {% else %}
+                <td></td>
+            {% endif %}
         </tr>
         {% endfor %}
         </tbody>
