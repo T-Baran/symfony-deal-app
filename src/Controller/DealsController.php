@@ -62,8 +62,17 @@ class DealsController extends AbstractController
             'form' => $form,
         ]);
     }
+    #[Route('/show/random', name: 'deal_random')]
+    public function getRandom(DealRepository $dealRepository): Response
+    {
+//        dd($dealRepository->findOneRandom());
+//        $deal = $dealRepository->findOneRandom();
+        return $this->render('deals/index.html.twig',[
+            'deals'=>$dealRepository->findOneRandom(),
+        ]);
+    }
     #[Route('/show/{id}', name:'deal_show')]
-    public function show(Deal $deal, Request $request, CommentRepository $commentRepository): Response
+    public function show(Deal $deal): Response
     {
         $comments = $deal->getComments();
         return $this->render('deals/show.html.twig',[
@@ -98,7 +107,6 @@ class DealsController extends AbstractController
         $em->flush();
         return $this->redirect($request->request->get('referer'));
     }
-
 
 
 }

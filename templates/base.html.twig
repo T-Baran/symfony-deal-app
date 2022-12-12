@@ -26,7 +26,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="#">Shoot some Deals</a>
+                        <a class="nav-link" aria-current="page" href="{{ path('deal_random') }}">Random Deal</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('deal_create') }}">Add Deal</a>
@@ -40,13 +40,13 @@
                     {% endif %}
                     {% if is_granted('ROLE_USER') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ path('user_dashboard') }}">Manage your Deals</a>
+                        <a class="nav-link" href="{{ path('user_dashboard') }}">Manage My Deals</a>
                     </li>
                     <li class="nav-item me-auto">
                         <a class="nav-link" href="{{ path('user_logout') }}">Logout</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">My account</a>
+                        <a class="nav-link" href="{{ path('user_menu') }}">My account</a>
                     </li>
                     {% else %}
                     <li class="nav-item">

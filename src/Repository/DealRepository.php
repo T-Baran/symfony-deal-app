@@ -38,6 +38,14 @@ class DealRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+        public function findOneRandom(): array
+    {
+        // get all tasks
+        $deals = $this->findAll();
+        // shuffle records
+        shuffle($deals);
+        return [$deals[0]];
+    }
 
 //    /**
 //     * @return Deal[] Returns an array of Deal objects
