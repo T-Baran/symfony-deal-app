@@ -8,7 +8,7 @@ use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
+
 
 #[Route('/admin')]
 class AdminDashboardController extends AbstractController
@@ -20,7 +20,7 @@ class AdminDashboardController extends AbstractController
     }
 
     #[Route('/deals', name:'admin_dashboard_deals')]
-    public function deals(DealRepository $dealRepository, UserInterface $user): Response
+    public function deals(DealRepository $dealRepository): Response
     {
         $deals = $dealRepository->findAll();
         return $this->render('admin_dashboard/deals.html.twig',[

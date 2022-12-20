@@ -44,8 +44,6 @@ class DealRepository extends ServiceEntityRepository
         $deals = $this->findAll();
         $count = count($deals);
         $randomInt = random_int(0,$count);
-        // shuffle records
-//        shuffle($deals);
         return [$deals[$randomInt]];
     }
 

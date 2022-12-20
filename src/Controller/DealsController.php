@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Deal;
 use App\Form\DealType;
-use App\Repository\CommentRepository;
 use App\Repository\DealRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -65,8 +64,6 @@ class DealsController extends AbstractController
     #[Route('/show/random', name: 'deal_random')]
     public function getRandom(DealRepository $dealRepository): Response
     {
-//        dd($dealRepository->findOneRandom());
-//        $deal = $dealRepository->findOneRandom();
         return $this->render('deals/index.html.twig',[
             'deals'=>$dealRepository->findOneRandom(),
         ]);
@@ -84,7 +81,6 @@ class DealsController extends AbstractController
     public function delete(Deal $deal, EntityManagerInterface $em, Request $request): Response
     {
         $this->denyAccessUnlessGranted('DELETE', $deal);
-//        dd($request->request->get('referer'));
         $em->remove($deal);
         $em->flush();
         $this->addFlash('success', 'Deal deleted');
@@ -107,6 +103,4 @@ class DealsController extends AbstractController
         $em->flush();
         return $this->redirect($request->request->get('referer'));
     }
-
-
 }

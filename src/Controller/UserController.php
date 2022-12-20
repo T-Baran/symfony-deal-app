@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,17 +38,20 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_menu');
     }
     #[Route('/user/{id}/email', name:'user_email', methods: ['POST'])]
-    public function editEmail(User $user, Request $request, EntityManagerInterface $em): Response
+    public function editEmail(User $user, Request $request, EntityManagerInterface $em , UserRepository $userRepository): Response
     {
         $this->denyAccessUnlessGranted('EDIT', $user);
         $submittedToken = $request->request->get('token');
-        if($this->isCsrfTokenValid('edit-email', $submittedToken)){
+        $submittedEmail = $request->request->get('email');
+        if(!empty($userRepository->findByEmail($submittedEmail))){
+            $this->addFlash('failure', 'Email already in use, please try again with different email address');
+        }elseif($this->isCsrfTokenValid('edit-email', $submittedToken) ){
             $user->setEmail($request->request->get('email'));
             $em->flush();
             $this->addFlash('success', 'Email updated successfully');
-            return $this->redirectToRoute('user_menu');
-        }
+        }else{
         $this->addFlash('failure', 'Please try again later');
+        }
         return $this->redirectToRoute('user_menu');
     }
     #[Route('/user/{id}/password',name: 'user_password', methods: ['POST'])]
@@ -60,6 +64,7 @@ class UserController extends AbstractController
         }
         $submittedToken = $request->request->get('token');
         $submittedPassword = $request->request->get('password');
+
         if($this->isCsrfTokenValid('edit-password', $submittedToken) && $passwordHasher->isPasswordValid($user, $request->request->get('oldPassword'))){
             $hashedPassword = $passwordHasher->hashPassword($user, $submittedPassword);
             $user->setPassword($hashedPassword);

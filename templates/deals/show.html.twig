@@ -3,7 +3,6 @@
 {% block title %}Browse Deals{% endblock %}
 
 {% block body %}
-{#justify-content-center align-items-lg-center col-mg-auto#}
     <div class="container mt-5 d-flex justify-content-center">
         <div class="row border shadow-sm w-75 d-flex">
             <div class="col-sm-auto  d-flex flex-column gap-4 flex-fill  ">
@@ -35,9 +34,7 @@
                             </form>
                         </div>
                     </div>
-
                     <div class="col text-end my-auto">
-
                         {{ deal.createdAt|ago }}
                     </div>
                 </div>
@@ -63,13 +60,8 @@
                             <span class="badge bg-info">You</span>
                         {% endif %}
                     </div>
-{#                        <div class="col text-end">#}
-{#                            <a href="#" class="btn btn-warning">Go to Deal</a>#}
-{#                        </div>#}
                 </div>
             </div>
-
-
                 <div class="row mt-4 mx-auto">
                     <p class="display-4 mb-4">Comments</p>
                     {% for comment in comments %}
@@ -115,11 +107,7 @@
                             </div>
                         </form>
                     </div>
-
-
                 </div>
-
-
         </div>
     </div>
 
