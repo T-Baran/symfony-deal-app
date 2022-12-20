@@ -42,9 +42,11 @@ class DealRepository extends ServiceEntityRepository
     {
         // get all tasks
         $deals = $this->findAll();
+        $count = count($deals);
+        $randomInt = random_int(0,$count);
         // shuffle records
-        shuffle($deals);
-        return [$deals[0]];
+//        shuffle($deals);
+        return [$deals[$randomInt]];
     }
 
 //    /**

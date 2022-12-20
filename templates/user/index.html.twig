@@ -1,20 +1,63 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello UserController!{% endblock %}
+{#{% block title %}{% endblock %}#}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="" style="max-width:100%; max-height:100%">
+    <div class="container mt-5 shadow" style="width:clamp(300px,75vw,750px)">
+        <div class="row d-flex justify-content-center pt-4">
+            <img src="{{ user.avatarUrl }}" class="rounded-circle bg-primary mb-4" style="width:min(300px, 75%); aspect-ratio:1 / 1">
+            </img>
+        </div>
+        <div class="row d-flex justify-content-center pb-3">
+            <div class="col-12 col-sm-6 text-center text-sm-end">
+                Username:
+            </div>
+            <div class="col-12 col-sm-6 d-flex justify-content-sm-between pe-sm-5 justify-content-center gap-3 align-items-start" x-data="{edit:false}">
+                <span x-show="!edit">{{ user.username }}</span>
+                <form action="{{ url('user_username',{id: user.id} ) }}" method="post" x-show="edit">
+                    <input type="text" name="username" x-show="edit" value="{{ user.username }}">
+                    <input type="hidden" name="token" value="{{ csrf_token('edit-username') }}" x-show="edit">
+                    <button class="badge bg-success border-0" type="submit" x-show="edit">Update</button>
+                </form>
+                <button class="badge bg-warning border-0" @click="edit = !edit">Edit</button>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center pb-3" x-data="{edit:false}">
+            <div class="col-12 col-sm-6 text-center text-sm-end">
+                Email:
+            </div>
+            <div class="col-12 col-sm-6 d-flex justify-content-sm-between pe-sm-5 justify-content-center gap-3 align-items-start">
+                <span x-show="!edit">{{ user.email }}</span>
+                <form action="{{ url('user_email',{id: user.id} ) }}" method="post" x-show="edit">
+                    <input type="email" name="email" x-show="edit" value="{{ user.email }}">
+                    <input type="hidden" name="token" value="{{ csrf_token('edit-email') }}" x-show="edit">
+                    <button class="badge bg-success border-0" type="submit" x-show="edit">Update</button>
+                </form>
+                <button class="badge bg-warning border-0" @click="edit = !edit">Edit</button>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center pb-3" x-data="{edit:false}">
+            <div class="col-12 col-sm-6 text-center text-sm-end">
+                Password:
+            </div>
+            <div class="col-12 col-sm-6 d-flex justify-content-sm-between pe-sm-5 justify-content-center gap-3 align-items-start">
+                <span x-show="!edit">*****</span>
+                <form action="{{ url('user_password',{id: user.id} ) }}" method="post" x-show="edit" x-data="{password:'',repeatedPassword:'' }" >
+                    <input type="password" name="password" x-model="password" x-show="edit" placeholder="Password">
+                    <input type="password" name="repeatedPassword" x-model="repeatedPassword" x-show="edit" placeholder="Repeat Password">
+                    <input type="password" name="oldPassword" x-show="edit" placeholder="Old Password">
+                    <input type="hidden" name="token" value="{{ csrf_token('edit-password') }}" x-show="edit">
+                    <div class="text-danger" x-show="password != repeatedPassword">Passwords don't match</div>
+                    <button class="badge bg-success border-0" type="submit" x-show="edit" :disabled="password != repeatedPassword">Update</button>
+                </form>
+                <button class="badge bg-warning border-0" @click="edit = !edit">Edit</button>
+            </div>
+        </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/projekty/promo/src/Controller/UserController.php'|file_link(0) }}">src/Controller/UserController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/projekty/promo/templates/user/index.html.twig'|file_link(0) }}">templates/user/index.html.twig</a></code></li>
-    </ul>
-</div>
+
+    </div>
+
+
 {% endblock %}
