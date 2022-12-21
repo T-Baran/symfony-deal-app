@@ -1,0 +1,14 @@
+again.later: Please try again later.
+add.comment: Comment added.
+update.comment: Comment updated.
+delete.comment: Comment deleted.
+add.deal: Deal created.
+update.deal: Deal updated.
+delete.deal: Deal deleted.
+role.change: Role changed.
+delete.user: User deleted.
+update.username: Username updated.
+email.used: Email already in use, please try again with different email address.
+update.email: Email updated.
+not.match.password: Passwords don't match.
+update.password: Password updated.

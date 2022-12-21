@@ -17,24 +17,26 @@ class UserDashboardController extends AbstractController
     {
         return $this->render('user_dashboard/index.html.twig');
     }
-    #[Route('/deals', name:'user_dashboard_deals')]
+
+    #[Route('/deals', name: 'user_dashboard_deals')]
     public function deals(DealRepository $dealRepository, UserInterface $user): Response
     {
         $deals = $dealRepository->findBy([
-            'user'=>$user->getId(),
+            'user' => $user->getId(),
         ]);
-        return $this->render('user_dashboard/deals.html.twig',[
-            'deals'=>$deals,
+        return $this->render('user_dashboard/deals.html.twig', [
+            'deals' => $deals,
         ]);
     }
-    #[Route('/comments', name:'user_dashboard_comments')]
+
+    #[Route('/comments', name: 'user_dashboard_comments')]
     public function comments(CommentRepository $commentRepository, UserInterface $user): Response
     {
         $comments = $commentRepository->findBy([
-            'user'=>$user->getId(),
+            'user' => $user->getId(),
         ]);
-        return $this->render('user_dashboard/comments.html.twig',[
-            'comments'=>$comments,
+        return $this->render('user_dashboard/comments.html.twig', [
+            'comments' => $comments,
         ]);
     }
 }

@@ -25,16 +25,17 @@ class CommentController extends AbstractController
             $deal->addComment($comment);
             $em->persist($deal);
             $em->flush();
-            $this->addFlash('success', 'Comment added');
-            return $this->redirectToRoute('deal_show',[
+            $this->addFlash('success', 'add.comment');
+            return $this->redirectToRoute('deal_show', [
                 'id' => $id,
             ]);
         }
-        $this->addFlash('failure', "Please try again later");
+        $this->addFlash('failure', "again.later");
         return $this->redirect($request->request->get('referer'));
     }
-    #[Route('/comment/edit/{id}', name:'comment_edit', methods: ['POST'])]
-    public function edit (Request $request, Comment $comment, EntityManagerInterface $em): Response
+
+    #[Route('/comment/edit/{id}', name: 'comment_edit', methods: ['POST'])]
+    public function edit(Request $request, Comment $comment, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('EDIT', $comment);
         $submittedToken = $request->request->get('token');
@@ -42,9 +43,9 @@ class CommentController extends AbstractController
             $comment->setContent($request->request->get('content'));
             $em->persist($comment);
             $em->flush();
-            $this->addFlash('success', 'Comment updated');
-        }else{
-        $this->addFlash('failure', "Please try again later");
+            $this->addFlash('success', 'update.comment');
+        } else {
+            $this->addFlash('failure', "again.later");
         }
         return $this->redirect($request->request->get('referer'));
     }
@@ -54,12 +55,12 @@ class CommentController extends AbstractController
     {
         $this->denyAccessUnlessGranted('DELETE', $comment);
         $submittedToken = $request->request->get('token');
-        if($this->isCsrfTokenValid('delete-comment', $submittedToken)){
+        if ($this->isCsrfTokenValid('delete-comment', $submittedToken)) {
             $em->remove($comment);
             $em->flush();
-            $this->addFlash('success', 'Comment deleted');
-        }else{
-        $this->addFlash('failure', "Please try again later");
+            $this->addFlash('success', 'delete.comment');
+        } else {
+            $this->addFlash('failure', "again.later");
         }
         return $this->redirect($request->request->get('referer'));
     }

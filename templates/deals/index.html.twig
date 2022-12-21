@@ -9,15 +9,16 @@
                 <div class="col-sm-auto col-mg-4 mx-auto d-flex justify-content-center align-items-center">
                     <img src="https://picsum.photos/280" alt="">
                 </div>
-                <div class="col-sm-auto col-md-5 flex-fill" >
+                <div class="col-sm-auto col-md-5 flex-fill">
                     <div class="row mb-3">
                         <div class="col mt-3 ">
                             <div class="btn-group" role="group" aria-label="Deal Score">
                                 <form action="{{ url('up_vote', {id: deal.id}) }}" method="POST">
-                                    <button type="submit" class="btn btn-danger" >+</button>
+                                    <button type="submit" class="btn btn-danger">+</button>
                                     <input type="hidden" name="referer" value="{{ app.request.uri }}">
                                 </form>
-                                <button type="button" class="btn btn-outline-primary" style="pointer-events: none;">{{ deal.score }}</button>
+                                <button type="button" class="btn btn-outline-primary"
+                                        style="pointer-events: none;">{{ deal.score }}</button>
                                 <form action="{{ url('down_vote', {id: deal.id}) }}" method="POST">
                                     <button type="submit" class="btn btn-primary">-</button>
                                     <input type="hidden" name="referer" value="{{ app.request.uri }}">
@@ -33,7 +34,9 @@
                     </div>
                     <div class="row mb-2">
                         <div class="col h3 d-flex gap-3 align-items-end">
-                            <span class="text-danger h2">{{ deal.price }}PLN </span> <span class="text-secondary h4"><del>{{ deal.priceBefore }}PLN</del></span> <span class="h4"> {{ ((-1+deal.price/deal.priceBefore)|number_format(2))*100  }}% </span> <span class="text-warning h4">{{ deal.seller }}</span>
+                            <span class="text-danger h2">{{ deal.price }}PLN </span> <span class="text-secondary h4"><del>{{ deal.priceBefore }}PLN</del></span>
+                            <span class="h4"> {{ ((-1+deal.price/deal.priceBefore)|number_format(2))*100 }}% </span>
+                            <span class="text-warning h4">{{ deal.seller }}</span>
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -41,8 +44,9 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col d-flex align-items-center gap-2">
-                            <img style="height: 30px;width: 30px; border-radius: 25%;" class="" src="{{ deal.user.avatarUrl }}" alt="avatar">
-                            <div style="height: 30px;"  class="h4 mb-0">{{ deal.user.username }}</div>
+                            <img style="height: 30px;width: 30px; border-radius: 25%;" class=""
+                                 src="{{ deal.user.avatarUrl }}" alt="avatar">
+                            <div style="height: 30px;" class="h4 mb-0">{{ deal.user.username }}</div>
                             {% if app.user is same as (deal.user) %}
                                 <span class="badge bg-info">You</span>
                             {% endif %}

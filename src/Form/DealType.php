@@ -19,8 +19,7 @@ class DealType extends AbstractType
             ->add('price', IntegerType::class)
             ->add('priceBefore', IntegerType::class)
             ->add('seller', TextType::class)
-            ->add('description', TextareaType::class)
-        ;
+            ->add('description', TextareaType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

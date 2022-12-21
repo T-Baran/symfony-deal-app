@@ -21,12 +21,11 @@ class Comment
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
-    #[ORM\JoinColumn(name: 'user', referencedColumnName:'id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'user', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(name: 'deal', referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
-
     private ?Deal $deal = null;
 
     public function getId(): ?int

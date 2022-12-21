@@ -9,10 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[UniqueEntity(fields: ['email'], message: 'email.not.unique')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -21,17 +22,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Assert\Email(
-        message:'The email {{ value }} is not a valid email.',
-    )]
+    #[Assert\Email(message: 'email.not.valid')]
     private ?string $email = null;
 
     #[ORM\Column]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     private ?string $password = null;
 
@@ -70,14 +66,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
@@ -99,9 +90,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): string
     {
         return $this->password;
@@ -114,18 +102,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-         $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 
-    /**
-     * @return Collection<int, Deal>
-     */
+
     public function getDeals(): Collection
     {
         return $this->deals;
@@ -165,9 +148,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Comment>
-     */
     public function getComments(): Collection
     {
         return $this->comments;
@@ -195,22 +175,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getAvatarUrl(): String
+    public function getAvatarUrl(): string
     {
-        return "https://avatars.dicebear.com/api/avataaars/".$this->username.".svg";
+        return "https://avatars.dicebear.com/api/avataaars/" . $this->username . ".svg";
     }
 
-    /**
-     * @return mixed
-     */
     public function getPlainPassword()
     {
         return $this->plainPassword;
     }
 
-    /**
-     * @param mixed $plainPassword
-     */
     public function setPlainPassword($plainPassword): void
     {
         $this->plainPassword = $plainPassword;

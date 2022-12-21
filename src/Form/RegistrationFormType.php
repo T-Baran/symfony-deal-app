@@ -6,6 +6,7 @@ use App\Entity\User;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -21,12 +22,12 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('username', TextType::class)
-            ->add('email')
+            ->add('email', EmailType::class)
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'constraints' => [
                     new IsTrue([
-                        'message' => 'You should agree to our terms.',
+                        'message' => 'agree.terms',
                     ]),
                 ],
             ])
@@ -37,23 +38,21 @@ class RegistrationFormType extends AbstractType
                 'type' => PasswordType::class,
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
-                'invalid_message' => 'The password fields must match.',
+                'invalid_message' => 'password.match',
                 'required' => true,
-                'first_options'  => ['label' => 'Password'],
+                'first_options' => ['label' => 'Password'],
                 'second_options' => ['label' => 'Repeat Password'],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter a password',
+                        'message' => 'password.not.blank',
                     ]),
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        // max length allowed by Symfony for security reasons
+                        'minMessage' => 'password.min.length',
                         'max' => 4096,
                     ]),
                 ],
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
