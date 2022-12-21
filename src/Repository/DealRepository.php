@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Deal;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -38,12 +39,18 @@ class DealRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-        public function findOneRandom(): array
+
+    public function findOneRandom(): array
     {
         // get all tasks
         $deals = $this->findAll();
         $count = count($deals);
-        $randomInt = random_int(0,$count);
+        $randomInt = random_int(0, $count);
         return [$deals[$randomInt]];
+    }
+
+    public function queryAll(): QueryBuilder
+    {
+        return $this->createQueryBuilder("q");
     }
 }

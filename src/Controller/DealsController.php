@@ -6,6 +6,8 @@ use App\Entity\Deal;
 use App\Form\DealType;
 use App\Repository\DealRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,12 +19,18 @@ class DealsController extends AbstractController
 {
     use TargetPathTrait;
 
-    #[Route('/', name: 'deals')]
-    public function index(DealRepository $dealRepository): Response
+    #[Route('/{page<\d+>}', name: 'deals')]
+    public function index(DealRepository $dealRepository, int $page = 1): Response
     {
-        $deals = $dealRepository->findAll();
+//        dd($dealRepository->queryAll());
+        $querybuilder = $dealRepository->queryAll();
+        $pagerfanta = new Pagerfanta(
+            new QueryAdapter($querybuilder)
+        );
+        $pagerfanta->setMaxPerPage(10);
+        $pagerfanta->setCurrentPage($page);
         return $this->render('deals/index.html.twig', [
-            'deals' => $deals,
+            'pager' => $pagerfanta,
         ]);
     }
 
