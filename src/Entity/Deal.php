@@ -45,9 +45,14 @@ class Deal
     #[ORM\OneToMany(mappedBy: 'deal', targetEntity: Comment::class)]
     private Collection $comments;
 
+    #[ORM\OneToMany(mappedBy: 'deal', targetEntity: Vote::class, orphanRemoval: true)]
+    private Collection $votes;
+
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,6 +168,36 @@ class Deal
             // set the owning side to null (unless already changed)
             if ($comment->getDeal() === $this) {
                 $comment->setDeal(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Vote>
+     */
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    public function addVote(Vote $vote): self
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setDeal($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVote(Vote $vote): self
+    {
+        if ($this->votes->removeElement($vote)) {
+            // set the owning side to null (unless already changed)
+            if ($vote->getDeal() === $this) {
+                $vote->setDeal(null);
             }
         }
 

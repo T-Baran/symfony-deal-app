@@ -22,7 +22,6 @@ class DealsController extends AbstractController
     #[Route('/{page<\d+>}', name: 'deals')]
     public function index(DealRepository $dealRepository, int $page = 1): Response
     {
-//        dd($dealRepository->queryAll());
         $querybuilder = $dealRepository->queryAll();
         $pagerfanta = new Pagerfanta(
             new QueryAdapter($querybuilder)
@@ -98,22 +97,6 @@ class DealsController extends AbstractController
         if (str_contains($request->request->get('referer'), 'show')) {
             return $this->redirect('/');
         }
-        return $this->redirect($request->request->get('referer'));
-    }
-
-    #[Route('/up/{id}', name: 'up_vote', methods: 'POST')]
-    public function upVote(Deal $deal, EntityManagerInterface $em, Request $request): Response
-    {
-        $deal->setScore($deal->getScore() + 1);
-        $em->flush();
-        return $this->redirect($request->request->get('referer'));
-    }
-
-    #[Route('/down/{id}', name: 'down_vote', methods: 'POST')]
-    public function downVote(Deal $deal, EntityManagerInterface $em, Request $request): Response
-    {
-        $deal->setScore($deal->getScore() - 1);
-        $em->flush();
         return $this->redirect($request->request->get('referer'));
     }
 }
