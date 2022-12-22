@@ -18,7 +18,8 @@ final class DealFactory extends ModelFactory
         return [
             'description' => self::faker()->text(200),
             'price' => self::faker()->randomNumber(5),
-            'priceBefore' => self::faker()->randomNumber(7),
+            'priceBefore' => self::faker()->randomNumber(6),
+            'discount' => self::faker()->randomNumber(2),
             'score' => self::faker()->randomNumber(2),
             'seller' => self::faker()->text(20),
             'title' => self::faker()->text(100),

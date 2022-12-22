@@ -3,18 +3,7 @@
 {% block title %}Browse Deals{% endblock %}
 
 {% block body %}
-    <div class="d-flex flex-column align-items-center my-4">
-        <p class="h4">Sort deals</p>
-        <div class="d-flex gap-4">
-        <a href="{{ path('deals', {'subject': 'p','page':1}) }}" class="btn btn-secondary">Price <i class="fa-solid fa-arrow-up"></i></a>
-        <a href="{{ path('deals', {'subject': 'pd','page':1}) }}" class="btn btn-secondary">Price <i class="fa-solid fa-arrow-down"></i></a>
-        <a href="{{ path('deals', {'subject': 'd','page':1}) }}" class="btn btn-secondary">Discount <i class="fa-solid fa-arrow-up"></i></a>
-        <a href="{{ path('deals', {'subject': 'dd','page':1}) }}" class="btn btn-secondary">Discount <i class="fa-solid fa-arrow-down"></i></a>
-        <a href="{{ path('deals', {'subject': 'v','page':1}) }}" class="btn btn-secondary">Votes <i class="fa-solid fa-arrow-down"></i></a>
-        </div>
-
-    </div>
-    {% for deal in pager %}
+    {% for deal in deals %}
         <div class="container mt-5 d-flex justify-content-center">
             <div class="row border shadow-sm w-75 d-flex">
                 <div class="col-sm-auto col-mg-4 mx-auto d-flex justify-content-center align-items-center">
@@ -71,7 +60,4 @@
             </div>
         </div>
     {% endfor %}
-    <div class="d-flex justify-content-center my-5">
-        {{ pagerfanta(pager) }}
-    </div>
 {% endblock %}

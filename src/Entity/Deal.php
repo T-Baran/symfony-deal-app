@@ -24,10 +24,13 @@ class Deal
     private ?string $title = null;
 
     #[ORM\Column]
-    private ?int $price = null;
+    private ?float $price = null;
 
     #[ORM\Column]
-    private ?int $priceBefore = null;
+    private ?float $priceBefore = null;
+
+    #[ORM\Column]
+    private ?int $discount = null;
 
     #[ORM\Column(length: 255)]
     private ?string $seller = null;
@@ -72,28 +75,38 @@ class Deal
         return $this;
     }
 
-    public function getPrice(): ?int
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(int $price): self
+    public function setPrice(float $price): self
     {
         $this->price = $price;
 
         return $this;
     }
 
-    public function getPriceBefore(): ?int
+    public function getPriceBefore(): ?float
     {
         return $this->priceBefore;
     }
 
-    public function setPriceBefore(int $priceBefore): self
+    public function setPriceBefore(float $priceBefore): self
     {
         $this->priceBefore = $priceBefore;
 
         return $this;
+    }
+
+    public function getDiscount(): ?int
+    {
+        return $this->discount;
+    }
+
+    public function setDiscount(int $discount): void
+    {
+        $this->discount = $discount;
     }
 
     public function getSeller(): ?string
@@ -144,9 +157,6 @@ class Deal
         return $this;
     }
 
-    /**
-     * @return Collection<int, Comment>
-     */
     public function getComments(): Collection
     {
         return $this->comments;
@@ -174,9 +184,6 @@ class Deal
         return $this;
     }
 
-    /**
-     * @return Collection<int, Vote>
-     */
     public function getVotes(): Collection
     {
         return $this->votes;

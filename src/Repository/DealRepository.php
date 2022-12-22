@@ -53,4 +53,29 @@ class DealRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder("q");
     }
+    public function findAllSortByPriceAsc(): QueryBuilder
+    {
+        return $this->createQueryBuilder("d")
+            ->orderBy('d.price', 'ASC');
+    }
+    public function findAllSortByPriceDesc(): QueryBuilder
+    {
+        return $this->createQueryBuilder("d")
+            ->orderBy('d.price', 'DESC');
+    }
+    public function findAllSortByDiscountAsc(): QueryBuilder
+    {
+        return $this->createQueryBuilder("d")
+            ->orderBy('d.discount', 'ASC');
+    }
+    public function findAllSortByDiscountDesc(): QueryBuilder
+    {
+        return $this->createQueryBuilder("d")
+            ->orderBy('d.discount', 'DESC');
+    }
+    public function findAllSortByVotesDesc(): QueryBuilder
+    {
+        return $this->createQueryBuilder("d")
+            ->orderBy('d.score', 'DESC');
+    }
 }

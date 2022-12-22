@@ -19,10 +19,17 @@ class DealsController extends AbstractController
 {
     use TargetPathTrait;
 
-    #[Route('/{page<\d+>}', name: 'deals')]
-    public function index(DealRepository $dealRepository, int $page = 1): Response
+    #[Route('/{page<\d+>}/{subject}', name: 'deals')]
+    public function index(DealRepository $dealRepository, string $subject = null, int $page = 1): Response
     {
-        $querybuilder = $dealRepository->queryAll();
+        match ($subject) {
+            'p' => $querybuilder = $dealRepository->findAllSortByPriceAsc(),
+            'pd' => $querybuilder = $dealRepository->findAllSortByPriceDesc(),
+            'd' => $querybuilder = $dealRepository->findAllSortByDiscountAsc(),
+            'dd' => $querybuilder = $dealRepository->findAllSortByDiscountDesc(),
+            'v' => $querybuilder = $dealRepository->findAllSortByVotesDesc(),
+            default => $querybuilder = $dealRepository->queryAll(),
+        };
         $pagerfanta = new Pagerfanta(
             new QueryAdapter($querybuilder)
         );
@@ -42,6 +49,7 @@ class DealsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $deal->setScore(0);
             $deal->setUser($security->getUser());
+            $deal->setDiscount(round($deal->getPrice() / $deal->getPriceBefore(), 2) * 100);
             $em->persist($deal);
             $em->flush();
             $this->addFlash('success', 'add.deal');
@@ -59,6 +67,7 @@ class DealsController extends AbstractController
         $form = $this->createForm(DealType::class, $deal);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $deal->setDiscount(round($deal->getPrice() / $deal->getPriceBefore(), 2) * 100);
             $em->persist($deal);
             $em->flush();
             $this->addFlash('success', 'update.deal');
@@ -72,7 +81,7 @@ class DealsController extends AbstractController
     #[Route('/show/random', name: 'deal_random')]
     public function getRandom(DealRepository $dealRepository): Response
     {
-        return $this->render('deals/index.html.twig', [
+        return $this->render('deals/random.html.twig', [
             'deals' => $dealRepository->findOneRandom(),
         ]);
     }

@@ -20,7 +20,7 @@
         {% for deal in deals %}
             <tr>
                 <th scope="row">{{ loop.index }}</th>
-                <td>{{ deal.title }}</td>
+                <td><a href="{{ path('deal_show',{'id':deal.id}) }}">{{ deal.title }}</a></td>
                 <td>{{ deal.price }}</td>
                 <td>{{ deal.priceBefore }}</td>
                 <td>{{ deal.seller }}</td>
