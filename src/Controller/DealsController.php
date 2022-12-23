@@ -19,6 +19,7 @@ class DealsController extends AbstractController
 {
     use TargetPathTrait;
 
+
     #[Route('/{page<\d+>}/{subject}', name: 'deals')]
     public function index(DealRepository $dealRepository, string $subject = null, int $page = 1): Response
     {
@@ -107,5 +108,16 @@ class DealsController extends AbstractController
             return $this->redirect('/');
         }
         return $this->redirect($request->request->get('referer'));
+    }
+
+    #[Route('/search', name: 'deal_search')]
+    public function search(Request $request, DealRepository $dealRepository): Response
+    {
+        $search = $request->query->get('q');
+        $deals = $dealRepository->findByQuery($search);
+        return $this->render('deals/random.html.twig', [
+            'deals' => $deals,
+        ]);
+
     }
 }
