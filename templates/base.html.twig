@@ -41,7 +41,7 @@
                 <li class="nav-item" x-data="{search:false}">
                     <a class="nav-link" @click="search=true" x-show="!search">Search <i
                                 class="fa-solid fa-magnifying-glass"></i></a>
-                    <form action="{{ url('deal_search') }}" :class="search?'d-flex':''" x-show="search">
+                    <form action="{{ url('deals') }}" :class="search?'d-flex':''" x-show="search">
                         <input name="q" type="text" class="form-control bg-primary text-white">
                         <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i>
                         </button>

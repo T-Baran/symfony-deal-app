@@ -21,15 +21,20 @@ class DealsController extends AbstractController
 
 
     #[Route('/{page<\d+>}/{subject}', name: 'deals')]
-    public function index(DealRepository $dealRepository, string $subject = null, int $page = 1): Response
+    public function index( DealRepository $dealRepository,Request $request, int $page = 1,string $subject = null): Response
     {
+        if($query = $request->query->get('q')){
+            $search = $dealRepository->findByQuery($query);
+        }else{
+            $search = $dealRepository->queryAll();
+        }
         match ($subject) {
-            'p' => $querybuilder = $dealRepository->findAllSortByPriceAsc(),
-            'pd' => $querybuilder = $dealRepository->findAllSortByPriceDesc(),
-            'd' => $querybuilder = $dealRepository->findAllSortByDiscountAsc(),
-            'dd' => $querybuilder = $dealRepository->findAllSortByDiscountDesc(),
-            'v' => $querybuilder = $dealRepository->findAllSortByVotesDesc(),
-            default => $querybuilder = $dealRepository->queryAll(),
+            'p' => $querybuilder = $dealRepository->sortByPriceAsc($search),
+            'pd' => $querybuilder = $dealRepository->sortByPriceDesc($search),
+            'd' => $querybuilder = $dealRepository->sortByDiscountAsc($search),
+            'dd' => $querybuilder = $dealRepository->sortByDiscountDesc($search),
+            'v' => $querybuilder = $dealRepository->sortByVotesDesc($search),
+            default => $querybuilder = $search,
         };
         $pagerfanta = new Pagerfanta(
             new QueryAdapter($querybuilder)
@@ -108,16 +113,5 @@ class DealsController extends AbstractController
             return $this->redirect('/');
         }
         return $this->redirect($request->request->get('referer'));
-    }
-
-    #[Route('/search', name: 'deal_search')]
-    public function search(Request $request, DealRepository $dealRepository): Response
-    {
-        $search = $request->query->get('q');
-        $deals = $dealRepository->findByQuery($search);
-        return $this->render('deals/random.html.twig', [
-            'deals' => $deals,
-        ]);
-
     }
 }

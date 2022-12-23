@@ -54,42 +54,35 @@ class DealRepository extends ServiceEntityRepository
         return $this->createQueryBuilder("q");
     }
 
-    public function findAllSortByPriceAsc(): QueryBuilder
-    {
-        return $this->createQueryBuilder("d")
-            ->orderBy('d.price', 'ASC');
-    }
-
-    public function findAllSortByPriceDesc(): QueryBuilder
-    {
-        return $this->createQueryBuilder("d")
-            ->orderBy('d.price', 'DESC');
-    }
-
-    public function findAllSortByDiscountAsc(): QueryBuilder
-    {
-        return $this->createQueryBuilder("d")
-            ->orderBy('d.discount', 'ASC');
-    }
-
-    public function findAllSortByDiscountDesc(): QueryBuilder
-    {
-        return $this->createQueryBuilder("d")
-            ->orderBy('d.discount', 'DESC');
-    }
-
-    public function findAllSortByVotesDesc(): QueryBuilder
-    {
-        return $this->createQueryBuilder("d")
-            ->orderBy('d.score', 'DESC');
-    }
-
-    public function findByQuery($search): array
+    public function findByQuery($search): QueryBuilder
     {
         return $this->createQueryBuilder('q')
             ->andWhere('q.title LIKE :val OR q.description LIKE :val OR q.seller LIKE :val')
-            ->setParameter('val', '%' . $search . '%')
-            ->getQuery()
-            ->getResult();
+            ->setParameter('val', '%' . $search . '%');
+    }
+
+    public function sortByPriceAsc($query): QueryBuilder
+    {
+        return $query->orderBy('q.price', 'ASC');
+    }
+
+    public function sortByPriceDesc($query): QueryBuilder
+    {
+        return $query->orderBy('q.price', 'DESC');
+    }
+
+    public function sortByDiscountAsc($query): QueryBuilder
+    {
+        return $query->orderBy('q.discount', 'ASC');
+    }
+
+    public function sortByDiscountDesc($query): QueryBuilder
+    {
+        return $query->orderBy('q.discount', 'DESC');
+    }
+
+    public function sortByVotesDesc($query): QueryBuilder
+    {
+        return $query->orderBy('q.score', 'DESC');
     }
 }
