@@ -21,19 +21,26 @@ class VoteController extends AbstractController
     public function upVote(Deal $deal, VoteRepository $voteRepository, EntityManagerInterface $em, Request $request, Security $security): Response
     {
         $user = $security->getUser();
-        $hasUserVoted = $voteRepository->findHasVoted($user, $deal);
-        if (!empty($hasUserVoted)) {
+        $hasUserUpVoted = $voteRepository->findHasUpVoted($user, $deal);
+        $hasUserDownVoted = $voteRepository->findHasDownVoted($user, $deal);
+        if (!empty($hasUserUpVoted)) {
             $this->addFlash('failure', 'vote.already');
-            return $this->redirect($request->request->get('referer'));
+        } elseif (!empty($hasUserDownVoted)) {
+            $vote = $voteRepository->find($hasUserDownVoted[0]);
+            $vote->setUpVote(true);
+            $deal->setScore($deal->getScore() + 2);
+            $em->flush();
+            $this->addFlash('success', 'vote.successful');
+        } else {
+            $vote = new Vote();
+            $vote->setUpVote(true);
+            $vote->setDeal($deal);
+            $vote->setUser($user);
+            $deal->setScore($deal->getScore() + 1);
+            $em->persist($vote);
+            $em->flush();
+            $this->addFlash('success', 'vote.successful');
         }
-        $vote = new Vote();
-        $vote->setUpVote(true);
-        $vote->setDeal($deal);
-        $vote->setUser($user);
-        $deal->setScore($deal->getScore() + 1);
-        $em->persist($vote);
-        $em->flush();
-        $this->addFlash('success', 'vote.successful');
         return $this->redirect($request->request->get('referer'));
     }
 
@@ -41,19 +48,26 @@ class VoteController extends AbstractController
     public function downVote(Deal $deal, VoteRepository $voteRepository, EntityManagerInterface $em, Request $request, Security $security): Response
     {
         $user = $security->getUser();
-        $hasUserVoted = $voteRepository->findHasVoted($user, $deal);
-        if (!empty($hasUserVoted)) {
+        $hasUserUpVoted = $voteRepository->findHasUpVoted($user, $deal);
+        $hasUserDownVoted = $voteRepository->findHasDownVoted($user, $deal);
+        if (!empty($hasUserDownVoted)) {
             $this->addFlash('failure', 'vote.already');
-            return $this->redirect($request->request->get('referer'));
+        } elseif (!empty($hasUserUpVoted)) {
+            $vote = $voteRepository->find($hasUserUpVoted[0]);
+            $vote->setUpVote(false);
+            $deal->setScore($deal->getScore() - 2);
+            $em->flush();
+            $this->addFlash('success', 'vote.successful');
+        } else {
+            $vote = new Vote();
+            $vote->setUpVote(false);
+            $vote->setDeal($deal);
+            $vote->setUser($user);
+            $deal->setScore($deal->getScore() - 1);
+            $em->persist($vote);
+            $em->flush();
+            $this->addFlash('success', 'vote.successful');
         }
-        $vote = new Vote();
-        $vote->setUpVote(false);
-        $vote->setDeal($deal);
-        $vote->setUser($user);
-        $deal->setScore($deal->getScore() - 1);
-        $em->persist($vote);
-        $em->flush();
-        $this->addFlash('success', 'vote.successful');
         return $this->redirect($request->request->get('referer'));
     }
 }

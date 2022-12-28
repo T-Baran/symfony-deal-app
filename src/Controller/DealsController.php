@@ -21,11 +21,11 @@ class DealsController extends AbstractController
 
 
     #[Route('/{page<\d+>}/{subject}', name: 'deals')]
-    public function index( DealRepository $dealRepository,Request $request, int $page = 1,string $subject = null): Response
+    public function index(DealRepository $dealRepository, Request $request, int $page = 1, string $subject = null): Response
     {
-        if($query = $request->query->get('q')){
+        if ($query = $request->query->get('q')) {
             $search = $dealRepository->findByQuery($query);
-        }else{
+        } else {
             $search = $dealRepository->queryAll();
         }
         match ($subject) {
@@ -87,6 +87,7 @@ class DealsController extends AbstractController
     #[Route('/show/random', name: 'deal_random')]
     public function getRandom(DealRepository $dealRepository): Response
     {
+
         return $this->render('deals/random.html.twig', [
             'deals' => $dealRepository->findOneRandom(),
         ]);

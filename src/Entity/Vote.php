@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Repository\VoteRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+#[ORM\UniqueConstraint(name:'user_deal', columns: ['deal_id', 'user_id'])]
 #[ORM\Entity(repositoryClass: VoteRepository::class)]
 class Vote
 {

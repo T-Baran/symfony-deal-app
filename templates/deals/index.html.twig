@@ -38,8 +38,16 @@
                                     <button type="submit" class="btn btn-danger">+</button>
                                     <input type="hidden" name="referer" value="{{ app.request.uri }}">
                                 </form>
-                                <button type="button" class="btn btn-outline-primary"
-                                        style="pointer-events: none;">{{ deal.score }}</button>
+                                {% if is_granted('UPVOTE', deal) %}
+                                    <button type="button" class="btn btn-outline-danger bg-danger text-white"
+                                            style="pointer-events: none;">{{ deal.score }}</button>
+                                {% elseif is_granted('DOWNVOTE', deal) %}
+                                    <button type="button" class="btn btn-outline-primary bg-primary text-white"
+                                            style="pointer-events: none;">{{ deal.score }}</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-outline-primary"
+                                            style="pointer-events: none;">{{ deal.score }}</button>
+                                {% endif %}
                                 <form action="{{ url('down_vote', {id: deal.id}) }}" method="POST">
                                     <button type="submit" class="btn btn-primary">-</button>
                                     <input type="hidden" name="referer" value="{{ app.request.uri }}">
@@ -61,7 +69,8 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col lead text-wrap text-break">{{ deal.description }}</div>
+                        <div class="col lead text-wrap text-break">{{ deal.description }}
+                        </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col d-flex align-items-center gap-2">

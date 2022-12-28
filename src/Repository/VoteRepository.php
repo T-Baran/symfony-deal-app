@@ -41,4 +41,26 @@ class VoteRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function findHasUpVoted($user, $deal): array
+    {
+        return $this->createQueryBuilder('v')
+            ->andWhere('v.user = :user')
+            ->andWhere('v.deal = :deal')
+            ->andWhere('v.UpVote = true')
+            ->setParameter('user', $user)
+            ->setParameter('deal', $deal)
+            ->getQuery()
+            ->getResult();
+    }
+    public function findHasDownVoted($user, $deal): array
+    {
+        return $this->createQueryBuilder('v')
+            ->andWhere('v.user = :user')
+            ->andWhere('v.deal = :deal')
+            ->andWhere('v.UpVote = false')
+            ->setParameter('user', $user)
+            ->setParameter('deal', $deal)
+            ->getQuery()
+            ->getResult();
+    }
 }
