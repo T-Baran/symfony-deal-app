@@ -41,6 +41,9 @@ class Deal
     #[ORM\Column]
     private ?int $score = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $photoFilename;
+
     #[ORM\ManyToOne(inversedBy: 'deals')]
     #[ORM\JoinColumn(name: 'user', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
@@ -208,6 +211,17 @@ class Deal
             }
         }
 
+        return $this;
+    }
+
+    public function getPhotoFilename(): ?string
+    {
+        return $this->photoFilename;
+    }
+
+    public function setPhotoFilename(?string $photoFilename): self
+    {
+        $this->photoFilename = $photoFilename;
         return $this;
     }
 }

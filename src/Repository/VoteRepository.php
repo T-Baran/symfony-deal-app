@@ -41,6 +41,7 @@ class VoteRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
     public function findHasUpVoted($user, $deal): array
     {
         return $this->createQueryBuilder('v')
@@ -52,6 +53,7 @@ class VoteRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
     public function findHasDownVoted($user, $deal): array
     {
         return $this->createQueryBuilder('v')

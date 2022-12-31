@@ -51,14 +51,16 @@ class DealRepository extends ServiceEntityRepository
 
     public function queryAll(): QueryBuilder
     {
-        return $this->createQueryBuilder("q");
+        return $this->createQueryBuilder("q")
+            ->orderBy('q.createdAt', 'DESC');
     }
 
     public function findByQuery($search): QueryBuilder
     {
         return $this->createQueryBuilder('q')
             ->andWhere('q.title LIKE :val OR q.description LIKE :val OR q.seller LIKE :val')
-            ->setParameter('val', '%' . $search . '%');
+            ->setParameter('val', '%' . $search . '%')
+            ->orderBy('q.createdAt', 'DESC');
     }
 
     public function sortByPriceAsc($query): QueryBuilder

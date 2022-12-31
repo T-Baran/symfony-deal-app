@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Deal;
 use App\Form\DealType;
 use App\Repository\DealRepository;
+use App\Service\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
@@ -47,7 +48,7 @@ class DealsController extends AbstractController
     }
 
     #[Route('/create', name: 'deal_create')]
-    public function create(EntityManagerInterface $em, Request $request, Security $security): Response
+    public function create(EntityManagerInterface $em, Request $request, Security $security, FileUploader $fileUploader): Response
     {
         $deal = new Deal();
         $form = $this->createForm(DealType::class, $deal);
@@ -56,6 +57,11 @@ class DealsController extends AbstractController
             $deal->setScore(0);
             $deal->setUser($security->getUser());
             $deal->setDiscount(round($deal->getPrice() / $deal->getPriceBefore(), 2) * 100);
+            $photoFile = $form->get('photoFilename')->getData();
+            if ($photoFile) {
+                $photoFilename = $fileUploader->upload($photoFile);
+                $deal->setPhotoFilename($photoFilename);
+            }
             $em->persist($deal);
             $em->flush();
             $this->addFlash('success', 'add.deal');
@@ -67,13 +73,19 @@ class DealsController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: 'deal_edit')]
-    public function edit(EntityManagerInterface $em, Deal $deal, Request $request): Response
+    public function edit(EntityManagerInterface $em, Deal $deal, Request $request, FileUploader $fileUploader): Response
     {
         $this->denyAccessUnlessGranted('EDIT', $deal);
         $form = $this->createForm(DealType::class, $deal);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $deal->setDiscount(round($deal->getPrice() / $deal->getPriceBefore(), 2) * 100);
+            $photoFile = $form->get('photoFilename')->getData();
+            if ($photoFile) {
+                $fileUploader->delete($deal->getPhotoFilename());
+                $photoFilename = $fileUploader->upload($photoFile);
+                $deal->setPhotoFilename($photoFilename);
+            };
             $em->persist($deal);
             $em->flush();
             $this->addFlash('success', 'update.deal');

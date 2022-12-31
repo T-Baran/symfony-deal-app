@@ -22,13 +22,18 @@
                class="btn btn-secondary">Votes <i
                         class="fa-solid fa-arrow-down"></i></a>
         </div>
-
     </div>
     {% for deal in pager %}
         <div class="container mt-5 d-flex justify-content-center">
             <div class="row border shadow-sm w-75 d-flex">
                 <div class="col-sm-auto col-mg-4 mx-auto d-flex justify-content-center align-items-center">
-                    <img src="https://picsum.photos/280" alt="">
+                    {% if deal.photoFilename is not null %}
+                        <img style="height: 280px; max-width: 280px"
+                             src="{{ asset('photos_directory/deal_images/' ~ deal.photoFilename) }}" alt="">
+                    {% else %}
+                        <img style="height: 280px; max-width: 280px"
+                             src="{{ 'https://picsum.photos/id/'~ deal.id ~ '/280' }}" alt="">
+                    {% endif %}
                 </div>
                 <div class="col-sm-auto col-md-5 flex-fill">
                     <div class="row mb-3">

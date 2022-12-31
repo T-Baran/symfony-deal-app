@@ -24,7 +24,7 @@ class HasVotedVoter extends Voter
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
         return in_array($attribute, [self::UPVOTE, self::DOWNVOTE])
-            && $subject instanceof \App\Entity\Deal ;
+            && $subject instanceof \App\Entity\Deal;
     }
 
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
@@ -34,7 +34,7 @@ class HasVotedVoter extends Voter
         if (!$user instanceof UserInterface) {
             return false;
         }
-        if (empty($this->voteRepository->findHasVoted($user, $subject))){
+        if (empty($this->voteRepository->findHasVoted($user, $subject))) {
             return false;
         }
 
@@ -42,13 +42,13 @@ class HasVotedVoter extends Voter
         switch ($attribute) {
             case self::UPVOTE:
                 $case = $this->voteRepository->findHasUpVoted($user, $subject);
-                if(!empty($case)){
+                if (!empty($case)) {
                     return true;
                 }
                 break;
             case self::DOWNVOTE:
                 $case = $this->voteRepository->findHasDownVoted($user, $subject);
-                if(!empty($case)){
+                if (!empty($case)) {
                     return true;
                 }
                 break;

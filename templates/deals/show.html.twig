@@ -5,8 +5,14 @@
 {% block body %}
     <div class="container mt-5 d-flex justify-content-center">
         <div class="row border shadow-sm w-75 d-flex">
-            <div class="col-sm-auto  d-flex flex-column gap-4 flex-fill  ">
-                <img src="https://picsum.photos/280" alt="">
+            <div class="col-sm-auto d-flex flex-column gap-4 flex-fill w-50 ">
+                {% if deal.photoFilename is not null %}
+                    <img style="height: 280px; max-width: 400px" class="mx-auto"
+                         src="{{ asset('photos_directory/deal_images/' ~ deal.photoFilename) }}" alt="">
+                {% else %}
+                    <img style="height: 280px; max-width: 400px" class="mx-auto"
+                         src="{{ 'https://picsum.photos/id/'~ deal.id ~ '/280' }}" alt="">
+                {% endif %}
                 <div class="d-flex gap-5">
                     {% if is_granted('EDIT', deal) %}
                         <a href="{{ path('deal_edit', {id: deal.id}) }}" class="btn btn-sm btn-info w-100">Edit</a>
@@ -27,8 +33,16 @@
                                 <button type="submit" class="btn btn-danger">+</button>
                                 <input type="hidden" name="referer" value="{{ app.request.uri }}">
                             </form>
-                            <button type="button" class="btn btn-outline-primary"
-                                    style="pointer-events: none;">{{ deal.score }}</button>
+                            {% if is_granted('UPVOTE', deal) %}
+                                <button type="button" class="btn btn-outline-danger bg-danger text-white"
+                                        style="pointer-events: none;">{{ deal.score }}</button>
+                            {% elseif is_granted('DOWNVOTE', deal) %}
+                                <button type="button" class="btn btn-outline-primary bg-primary text-white"
+                                        style="pointer-events: none;">{{ deal.score }}</button>
+                            {% else %}
+                                <button type="button" class="btn btn-outline-primary"
+                                        style="pointer-events: none;">{{ deal.score }}</button>
+                            {% endif %}
                             <form action="{{ url('down_vote', {id: deal.id}) }}" method="POST">
                                 <button type="submit" class="btn btn-primary">-</button>
                                 <input type="hidden" name="referer" value="{{ app.request.uri }}">
