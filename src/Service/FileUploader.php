@@ -33,11 +33,11 @@ class FileUploader
         return $fileName;
     }
 
-    public function delete(string $fileName)
+    public function delete(?string $fileName)
     {
         $fs = new FileSystem();
 //        dd($fs->exists($this->getTargetDirectory().'/'.$fileName));
-        if ($fs->exists($this->getTargetDirectory() . '/' . $fileName)) {
+        if ($fileName !== null && $fs->exists($this->getTargetDirectory() . '/' . $fileName)) {
             $fs->remove($this->getTargetDirectory() . '/' . $fileName);
         }
         return new Response('', 200);
