@@ -54,9 +54,13 @@ class DealsController extends AbstractController
         $form = $this->createForm(DealType::class, $deal);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            if($deal->getPrice()>$deal->getPriceBefore()){
+                $this->addFlash('failure', 'before.lower');
+                return $this->redirectToRoute('deals');
+            }
             $deal->setScore(0);
             $deal->setUser($security->getUser());
-            $deal->setDiscount(round($deal->getPrice() / $deal->getPriceBefore(), 2) * 100);
+            $deal->setDiscount((1 - round($deal->getPrice() / $deal->getPriceBefore(), 2)) * 100);
             $photoFile = $form->get('photoFilename')->getData();
             if ($photoFile) {
                 $photoFilename = $fileUploader->upload($photoFile);
@@ -79,7 +83,11 @@ class DealsController extends AbstractController
         $form = $this->createForm(DealType::class, $deal);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $deal->setDiscount(round($deal->getPrice() / $deal->getPriceBefore(), 2) * 100);
+            if($deal->getPrice()>$deal->getPriceBefore()){
+                $this->addFlash('failure', 'before.lower');
+                return $this->redirectToRoute('deals');
+            }
+            $deal->setDiscount((1 - round($deal->getPrice() / $deal->getPriceBefore(), 2)) * 100);
             $photoFile = $form->get('photoFilename')->getData();
             if ($photoFile) {
                 $fileUploader->delete($deal->getPhotoFilename());
@@ -99,10 +107,8 @@ class DealsController extends AbstractController
     #[Route('/show/random', name: 'deal_random')]
     public function getRandom(DealRepository $dealRepository): Response
     {
-
-        return $this->render('deals/random.html.twig', [
-            'deals' => $dealRepository->findOneRandom(),
-        ]);
+        $deal = $dealRepository->findOneRandom()->getId();
+        return $this->redirectToRoute('deal_show', ['id' => $deal]);
     }
 
     #[Route('/show/{id}', name: 'deal_show')]

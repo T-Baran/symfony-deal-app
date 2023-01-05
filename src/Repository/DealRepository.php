@@ -40,13 +40,13 @@ class DealRepository extends ServiceEntityRepository
         }
     }
 
-    public function findOneRandom(): array
+    public function findOneRandom(): Deal
     {
         // get all tasks
         $deals = $this->findAll();
         $count = count($deals);
-        $randomInt = random_int(0, $count);
-        return [$deals[$randomInt]];
+        $randomInt = random_int(0, $count-1);
+        return $deals[$randomInt];
     }
 
     public function queryAll(): QueryBuilder
