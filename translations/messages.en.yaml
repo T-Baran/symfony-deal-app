@@ -12,6 +12,7 @@ email.used: Email already in use, please try again with different email address.
 update.email: Email updated.
 not.match.password: Passwords don't match.
 update.password: Password updated.
+password.wrong: Wrong Password.
 vote.already: You have already voted.
 vote.successful: Thank You for your vote.
 before.lower: Please give us a real deal.

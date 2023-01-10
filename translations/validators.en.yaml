@@ -3,4 +3,5 @@ email.not.valid: The email {{ value }} is not a valid email.
 agree.terms: You should agree to our terms.
 password.match: The password fields must match.
 password.not.blank: Please enter a password.
-password.min.length: Your password should be at least {{ limit }} characters.
+password.min.length: Your password should have at least {{ limit }} characters.
+username.min.length: Your username should have at least {{ limit }} characters.

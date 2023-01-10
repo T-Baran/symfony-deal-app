@@ -29,7 +29,7 @@
                 </td>
                 <td>{{ comment.createdAt|ago }}</td>
                 <td>{{ comment.user.username }}</td>
-                <td @click="edit = true">
+                <td @click="edit = !edit">
                     <button class="btn btn-warning">Edit</button>
                 </td>
                 {% if is_granted('DELETE',comment) %}

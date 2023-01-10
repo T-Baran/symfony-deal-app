@@ -3,9 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserEmailType;
+use App\Form\UserPasswordType;
+use App\Form\UserUsernameType;
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Exception\DatabaseDoesNotExist;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -16,66 +21,107 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class UserController extends AbstractController
 {
     #[Route('/user', name: 'user_menu')]
-    public function index(Security $security): Response
+    public function index(Security $security, Request $request, EntityManagerInterface $em): Response
     {
         $user = $security->getUser();
-        return $this->render('user/index.html.twig', [
+        $formEmail = $this->createForm(UserEmailType::class, $user, [
+            'action' => $this->generateUrl('user_email'),
+            'method' => 'PATCH'
+        ]);
+        $formUsername = $this->createForm(UserUsernameType::class, $user, [
+            'action' => $this->generateUrl('user_username'),
+            'method' => 'PATCH'
+        ]);
+        $formPassword = $this->createForm(UserPasswordType::class, $user, [
+            'action' => $this->generateUrl('user_password'),
+            'method' => 'PATCH'
+        ]);
+
+        return $this->renderForm('user/index.html.twig', [
             'user' => $user,
+            'formEmail' => $formEmail,
+            'formUsername' => $formUsername,
+            'formPassword' => $formPassword
         ]);
     }
 
-    #[Route('/user/{id}/username', name: 'user_username', methods: ['POST'])]
-    public function editUsername(User $user, Request $request, EntityManagerInterface $em): Response
+    #[Route('/user/username', name: 'user_username', methods: ['POST'])]
+    public function editUsername(Security $security, Request $request, EntityManagerInterface $em): Response
     {
+        $user = $security->getUser();
         $this->denyAccessUnlessGranted('EDIT', $user);
-        $submittedToken = $request->request->get('token');
-        if ($this->isCsrfTokenValid('edit-username', $submittedToken)) {
-            $user->setUsername($request->request->get('username'));
+        $formUsername = $this->createForm(UserUsernameType::class, $user);
+        $formUsername->handleRequest($request);
+        if ($formUsername->isSubmitted() && $formUsername->isValid()) {
             $em->flush();
             $this->addFlash('success', 'update.username');
-            return $this->redirectToRoute('user_menu');
+        } else {
+            $this->printErrors($formUsername);
         }
-        $this->addFlash('failure', 'again.later');
         return $this->redirectToRoute('user_menu');
     }
 
-    #[Route('/user/{id}/email', name: 'user_email', methods: ['POST'])]
-    public function editEmail(User $user, Request $request, EntityManagerInterface $em, UserRepository $userRepository): Response
+    #[Route('/user/email', name: 'user_email', methods: ['POST'])]
+    public function editEmail(Security $security, Request $request, EntityManagerInterface $em): Response
     {
+        $user = $security->getUser();
         $this->denyAccessUnlessGranted('EDIT', $user);
-        $submittedToken = $request->request->get('token');
-        $submittedEmail = $request->request->get('email');
-        if (!empty($userRepository->findByEmail($submittedEmail))) {
-            $this->addFlash('failure', 'email.used');
-        } elseif ($this->isCsrfTokenValid('edit-email', $submittedToken)) {
-            $user->setEmail($request->request->get('email'));
+        $formEmail = $this->createForm(UserEmailType::class, $user);
+        $formEmail->handleRequest($request);
+        if ($formEmail->isSubmitted() && $formEmail->isValid()) {
             $em->flush();
             $this->addFlash('success', 'update.email');
         } else {
-            $this->addFlash('failure', 'again.later');
+            $this->printErrors($formEmail);
         }
         return $this->redirectToRoute('user_menu');
     }
 
-    #[Route('/user/{id}/password', name: 'user_password', methods: ['POST'])]
-    public function editPassword(User $user, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
+    #[Route('/user/password', name: 'user_password', methods: ['POST'])]
+    public function editPassword(Security $security, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
     {
+        $user = $security->getUser();
         $this->denyAccessUnlessGranted('EDIT', $user);
-        if ($request->request->get('password') !== $request->request->get('repeatedPassword')) {
-            $this->addFlash('failure', "not.match.password");
-            return $this->redirectToRoute('user_menu');
-        }
-        $submittedToken = $request->request->get('token');
-        $submittedPassword = $request->request->get('password');
+//        if ($request->request->get('password') !== $request->request->get('repeatedPassword')) {
+//            $this->addFlash('failure', "not.match.password");
+//            return $this->redirectToRoute('user_menu');
+//        }
+//        $submittedPassword = $request->request->get('password');
+        $formPassword = $this->createForm(UserPasswordType::class, $user);
+        $formPassword->handleRequest($request);
+        if ($formPassword->isSubmitted() && $formPassword->isValid()) {
+            $oldPassword = $formPassword['oldPlainPassword']->getData();
+            if ($passwordHasher->isPasswordValid($user, $oldPassword)) {
+                $newPassword = $formPassword['newPlainPassword']->getData();
+                $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
+                $user->setPassword($hashedPassword);
+                $em->flush();
+                $this->addFlash('success', 'update.password');
+            } else {
+                $this->addFlash('failure', 'password.wrong');
+            }
+        } else {
+            $this->printErrors($formPassword);
 
-        if ($this->isCsrfTokenValid('edit-password', $submittedToken) && $passwordHasher->isPasswordValid($user, $request->request->get('oldPassword'))) {
-            $hashedPassword = $passwordHasher->hashPassword($user, $submittedPassword);
-            $user->setPassword($hashedPassword);
-            $em->flush();
-            $this->addFlash('success', 'update.password');
-            return $this->redirectToRoute('user_menu');
         }
-        $this->addFlash('failure', 'again.later');
         return $this->redirectToRoute('user_menu');
+
+//        if ($this->isCsrfTokenValid('edit-password', $submittedToken) && $passwordHasher->isPasswordValid($user, $request->request->get('oldPassword'))) {
+//            $hashedPassword = $passwordHasher->hashPassword($user, $submittedPassword);
+//            $user->setPassword($hashedPassword);
+//            $em->flush();
+//            $this->addFlash('success', 'update.password');
+//            return $this->redirectToRoute('user_menu');
+//        }
+//        $this->addFlash('failure', 'again.later');
+//        $this->printErrors($formPassword);
+
+    }
+
+    public function printErrors(FormInterface $form): void
+    {
+        foreach ($form->getErrors() as $error) {
+            $this->addFlash('failure', $error->getMessage());
+        }
     }
 }

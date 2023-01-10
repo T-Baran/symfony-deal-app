@@ -30,7 +30,7 @@ class VoteController extends AbstractController
             $vote->setUpVote(true);
             $deal->setScore($deal->getScore() + 2);
             $em->flush();
-            $this->addFlash('success', 'vote.successful');
+//            $this->addFlash('success', 'vote.successful');
         } else {
             $vote = new Vote();
             $vote->setUpVote(true);
@@ -39,7 +39,7 @@ class VoteController extends AbstractController
             $deal->setScore($deal->getScore() + 1);
             $em->persist($vote);
             $em->flush();
-            $this->addFlash('success', 'vote.successful');
+//            $this->addFlash('success', 'vote.successful');
         }
         return $this->redirect($request->request->get('referer'));
     }
@@ -57,7 +57,7 @@ class VoteController extends AbstractController
             $vote->setUpVote(false);
             $deal->setScore($deal->getScore() - 2);
             $em->flush();
-            $this->addFlash('success', 'vote.successful');
+//            $this->addFlash('success', 'vote.successful');
         } else {
             $vote = new Vote();
             $vote->setUpVote(false);
@@ -66,7 +66,7 @@ class VoteController extends AbstractController
             $deal->setScore($deal->getScore() - 1);
             $em->persist($vote);
             $em->flush();
-            $this->addFlash('success', 'vote.successful');
+//            $this->addFlash('success', 'vote.successful');
         }
         return $this->redirect($request->request->get('referer'));
     }
