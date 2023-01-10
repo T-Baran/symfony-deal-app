@@ -54,9 +54,9 @@ class DealsController extends AbstractController
         $form = $this->createForm(DealType::class, $deal);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            if($deal->getPrice()>$deal->getPriceBefore()){
+            if ($deal->getPrice() > $deal->getPriceBefore()) {
                 $this->addFlash('failure', 'before.lower');
-                return $this->redirectToRoute('deals');
+                return $this->redirectToRoute('deal_create');
             }
             $deal->setScore(0);
             $deal->setUser($security->getUser());
@@ -83,9 +83,13 @@ class DealsController extends AbstractController
         $form = $this->createForm(DealType::class, $deal);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            if($deal->getPrice()>$deal->getPriceBefore()){
+            $session = $request->getSession();
+            if (strpos($request->request->get('referer'), '/edit/') == false) {
+                $session->set('referer', $request->request->get('referer'));
+            }
+            if ($deal->getPrice() > $deal->getPriceBefore()) {
                 $this->addFlash('failure', 'before.lower');
-                return $this->redirectToRoute('deals');
+                return $this->redirectToRoute('deal_edit', ['id' => $deal->getId()]);
             }
             $deal->setDiscount((1 - round($deal->getPrice() / $deal->getPriceBefore(), 2)) * 100);
             $photoFile = $form->get('photoFilename')->getData();
@@ -97,7 +101,7 @@ class DealsController extends AbstractController
             $em->persist($deal);
             $em->flush();
             $this->addFlash('success', 'update.deal');
-            return $this->redirect($request->request->get('referer'));
+            return $this->redirect($session->get('referer'));
         }
         return $this->renderForm('deals/edit.html.twig', [
             'form' => $form,
