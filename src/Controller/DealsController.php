@@ -9,18 +9,15 @@ use App\Service\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 class DealsController extends AbstractController
 {
-    use TargetPathTrait;
-
-
     #[Route('/{page<\d+>}/{subject}', name: 'deals')]
     public function index(DealRepository $dealRepository, Request $request, int $page = 1, string $subject = null): Response
     {
@@ -46,7 +43,7 @@ class DealsController extends AbstractController
             'pager' => $pagerfanta,
         ]);
     }
-
+    #[IsGranted('ROLE_USER')]
     #[Route('/create', name: 'deal_create')]
     public function create(EntityManagerInterface $em, Request $request, Security $security, FileUploader $fileUploader): Response
     {

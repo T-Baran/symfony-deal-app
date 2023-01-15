@@ -5,12 +5,14 @@ namespace App\Controller;
 use App\Repository\CommentRepository;
 use App\Repository\DealRepository;
 use App\Repository\UserRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 
 #[Route('/admin')]
+#[IsGranted('ROLE_EDITOR')]
 class AdminDashboardController extends AbstractController
 {
     #[Route('/', name: 'admin_dashboard')]

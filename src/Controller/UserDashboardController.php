@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Repository\CommentRepository;
 use App\Repository\DealRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/user/dashboard')]
+#[IsGranted('IS_AUTHENTICATED_REMEMBERED')]
 class UserDashboardController extends AbstractController
 {
     #[Route('/', name: 'user_dashboard')]

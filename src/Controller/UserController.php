@@ -2,12 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Form\UserEmailType;
 use App\Form\UserPasswordType;
 use App\Form\UserUsernameType;
-use App\Repository\UserRepository;
-use Doctrine\DBAL\Exception\DatabaseDoesNotExist;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -16,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserController extends AbstractController
 {
@@ -82,11 +78,6 @@ class UserController extends AbstractController
     {
         $user = $security->getUser();
         $this->denyAccessUnlessGranted('EDIT', $user);
-//        if ($request->request->get('password') !== $request->request->get('repeatedPassword')) {
-//            $this->addFlash('failure', "not.match.password");
-//            return $this->redirectToRoute('user_menu');
-//        }
-//        $submittedPassword = $request->request->get('password');
         $formPassword = $this->createForm(UserPasswordType::class, $user);
         $formPassword->handleRequest($request);
         if ($formPassword->isSubmitted() && $formPassword->isValid()) {
@@ -105,17 +96,6 @@ class UserController extends AbstractController
 
         }
         return $this->redirectToRoute('user_menu');
-
-//        if ($this->isCsrfTokenValid('edit-password', $submittedToken) && $passwordHasher->isPasswordValid($user, $request->request->get('oldPassword'))) {
-//            $hashedPassword = $passwordHasher->hashPassword($user, $submittedPassword);
-//            $user->setPassword($hashedPassword);
-//            $em->flush();
-//            $this->addFlash('success', 'update.password');
-//            return $this->redirectToRoute('user_menu');
-//        }
-//        $this->addFlash('failure', 'again.later');
-//        $this->printErrors($formPassword);
-
     }
 
     public function printErrors(FormInterface $form): void

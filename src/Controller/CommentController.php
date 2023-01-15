@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Comment;
 use App\Entity\Deal;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,6 +15,7 @@ use Symfony\Component\Security\Core\Security;
 class CommentController extends AbstractController
 {
     #[Route('/comment/create/{id}', name: 'comment_create', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function create($id, Request $request, Deal $deal, Security $security, EntityManagerInterface $em): Response
     {
         $submittedToken = $request->request->get('token');
