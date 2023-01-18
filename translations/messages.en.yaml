@@ -16,3 +16,4 @@ password.wrong: Wrong Password.
 vote.already: You have already voted.
 vote.successful: Thank You for your vote.
 before.lower: Please give us a real deal.
+register.successful: You have successfully registered. You can login now.

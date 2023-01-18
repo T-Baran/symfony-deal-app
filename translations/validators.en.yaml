@@ -1,5 +1,6 @@
 email.not.unique: There is already an account with this email.
 email.not.valid: The email {{ value }} is not a valid email.
+email.not.blank: Please provide email address.
 agree.terms: You should agree to our terms.
 password.match: The password fields must match.
 password.not.blank: Please enter a password.

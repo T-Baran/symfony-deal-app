@@ -50,7 +50,9 @@ class VoteRepository extends ServiceEntityRepository
             ->andWhere('v.UpVote = true')
             ->setParameter('user', $user)
             ->setParameter('deal', $deal)
+            ->setMaxResults(1)
             ->getQuery()
+//            ->getOneOrNullResult();
             ->getResult();
     }
 
@@ -62,7 +64,9 @@ class VoteRepository extends ServiceEntityRepository
             ->andWhere('v.UpVote = false')
             ->setParameter('user', $user)
             ->setParameter('deal', $deal)
+            ->setMaxResults(1)
             ->getQuery()
+//            ->getOneOrNullResult();
             ->getResult();
     }
 }

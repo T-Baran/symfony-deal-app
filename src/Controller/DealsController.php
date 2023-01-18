@@ -5,8 +5,9 @@ namespace App\Controller;
 use App\Entity\Deal;
 use App\Form\DealType;
 use App\Repository\DealRepository;
+use App\Service\DealManager;
 use App\Service\FileUploader;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -18,22 +19,15 @@ use Symfony\Component\Security\Core\Security;
 
 class DealsController extends AbstractController
 {
-    #[Route('/{page<\d+>}/{subject}', name: 'deals')]
-    public function index(DealRepository $dealRepository, Request $request, int $page = 1, string $subject = null): Response
+
+    public function __construct(private DealRepository $dealRepository, private FileUploader $fileUploader, private DealManager $dealManager, private Security $security)
     {
-        if ($query = $request->query->get('q')) {
-            $search = $dealRepository->findByQuery($query);
-        } else {
-            $search = $dealRepository->queryAll();
-        }
-        match ($subject) {
-            'p' => $querybuilder = $dealRepository->sortByPriceAsc($search),
-            'pd' => $querybuilder = $dealRepository->sortByPriceDesc($search),
-            'd' => $querybuilder = $dealRepository->sortByDiscountAsc($search),
-            'dd' => $querybuilder = $dealRepository->sortByDiscountDesc($search),
-            'v' => $querybuilder = $dealRepository->sortByVotesDesc($search),
-            default => $querybuilder = $search,
-        };
+    }
+
+    #[Route('/{page<\d+>}/{subject}', name: 'deals')]
+    public function index(Request $request, int $page = 1, string $subject = null): Response
+    {
+        $querybuilder = $this->getQuery($request->query->get('q'), $subject);
         $pagerfanta = new Pagerfanta(
             new QueryAdapter($querybuilder)
         );
@@ -43,64 +37,26 @@ class DealsController extends AbstractController
             'pager' => $pagerfanta,
         ]);
     }
+
     #[IsGranted('ROLE_USER')]
     #[Route('/create', name: 'deal_create')]
-    public function create(EntityManagerInterface $em, Request $request, Security $security, FileUploader $fileUploader): Response
+    public function create(Request $request): Response
     {
         $deal = new Deal();
         $form = $this->createForm(DealType::class, $deal);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            if ($deal->getPrice() > $deal->getPriceBefore()) {
-                $this->addFlash('failure', 'before.lower');
-                return $this->redirectToRoute('deal_create');
-            }
-            $deal->setScore(0);
-            $deal->setUser($security->getUser());
-            $deal->setDiscount((1 - round($deal->getPrice() / $deal->getPriceBefore(), 2)) * 100);
-            $photoFile = $form->get('photoFilename')->getData();
-            if ($photoFile) {
-                $photoFilename = $fileUploader->upload($photoFile);
-                $deal->setPhotoFilename($photoFilename);
-            }
-            $em->persist($deal);
-            $em->flush();
-            $this->addFlash('success', 'add.deal');
-            return $this->redirectToRoute('deals');
-        }
-        return $this->renderForm('deals/create.html.twig', [
+
+        return $this->addUpdate($deal, $request, true) ?? $this->renderForm('deals/create.html.twig', [
             'form' => $form,
         ]);
     }
 
     #[Route('/edit/{id}', name: 'deal_edit')]
-    public function edit(EntityManagerInterface $em, Deal $deal, Request $request, FileUploader $fileUploader): Response
+    public function edit(Deal $deal, Request $request): Response
     {
         $this->denyAccessUnlessGranted('EDIT', $deal);
         $form = $this->createForm(DealType::class, $deal);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $session = $request->getSession();
-            if (strpos($request->request->get('referer'), '/edit/') == false) {
-                $session->set('referer', $request->request->get('referer'));
-            }
-            if ($deal->getPrice() > $deal->getPriceBefore()) {
-                $this->addFlash('failure', 'before.lower');
-                return $this->redirectToRoute('deal_edit', ['id' => $deal->getId()]);
-            }
-            $deal->setDiscount((1 - round($deal->getPrice() / $deal->getPriceBefore(), 2)) * 100);
-            $photoFile = $form->get('photoFilename')->getData();
-            if ($photoFile) {
-                $fileUploader->delete($deal->getPhotoFilename());
-                $photoFilename = $fileUploader->upload($photoFile);
-                $deal->setPhotoFilename($photoFilename);
-            };
-            $em->persist($deal);
-            $em->flush();
-            $this->addFlash('success', 'update.deal');
-            return $this->redirect($session->get('referer'));
-        }
-        return $this->renderForm('deals/edit.html.twig', [
+
+        return $this->addUpdate($deal, $request, false) ?? $this->renderForm('deals/edit.html.twig', [
             'form' => $form,
         ]);
     }
@@ -123,15 +79,76 @@ class DealsController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: 'deal_delete', methods: ['POST'])]
-    public function delete(Deal $deal, EntityManagerInterface $em, Request $request): Response
+    public function delete(Deal $deal, Request $request): Response
     {
         $this->denyAccessUnlessGranted('DELETE', $deal);
-        $em->remove($deal);
-        $em->flush();
+        $this->dealManager->delete($deal);
         $this->addFlash('success', 'delete.deal');
         if (str_contains($request->request->get('referer'), 'show')) {
             return $this->redirect('/');
         }
         return $this->redirect($request->request->get('referer'));
+    }
+
+    private function getQuery($query, $subject): QueryBuilder
+    {
+        if ($query) {
+            $search = $this->dealRepository->findByQuery($query);
+        } else {
+            $search = $this->dealRepository->queryAll();
+        }
+        match ($subject) {
+            'p' => $querybuilder = $this->dealRepository->sortByPriceAsc($search),
+            'pd' => $querybuilder = $this->dealRepository->sortByPriceDesc($search),
+            'd' => $querybuilder = $this->dealRepository->sortByDiscountAsc($search),
+            'dd' => $querybuilder = $this->dealRepository->sortByDiscountDesc($search),
+            'v' => $querybuilder = $this->dealRepository->sortByVotesDesc($search),
+            default => $querybuilder = $search,
+        };
+        return $querybuilder;
+    }
+
+    private function fillFields(Deal $deal, $photoFile, bool $isNew): Deal
+    {
+        if ($isNew) {
+            $deal->setScore(0);
+            $deal->setUser($this->security->getUser());
+        }
+        $deal->setDiscount((1 - round($deal->getPrice() / $deal->getPriceBefore(), 2)) * 100);
+        if ($photoFile) {
+            if (!$isNew) {
+                $this->fileUploader->delete($deal->getPhotoFilename());
+            }
+            $photoFilename = $this->fileUploader->upload($photoFile);
+            $deal->setPhotoFilename($photoFilename);
+        }
+        return $deal;
+    }
+
+    private function addUpdate(Deal $deal, Request $request, bool $isNew)
+    {
+        $form = $this->createForm(DealType::class, $deal);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $session = $request->getSession();
+            if (!$isNew && !str_contains($request->request->get('referer'), '/edit/')) {
+                $session->set('referer', $request->request->get('referer'));
+            }
+            if ($deal->getPrice() > $deal->getPriceBefore()) {
+                $this->addFlash('failure', 'before.lower');
+                if ($isNew) {
+                    return $this->redirectToRoute('deal_create');
+                }
+                return $this->redirectToRoute('deal_edit', ['id' => $deal->getId()]);
+            }
+            $deal = $this->fillFields($deal, $form->get('photoFilename')->getData(), $isNew);
+            $this->dealManager->save($deal);
+            if (!$isNew) {
+                $this->addFlash('success', 'update.deal');
+                return $this->redirect($session->get('referer'));
+            }
+            $this->addFlash('success', 'add.deal');
+            return $this->redirectToRoute('deals');
+        }
     }
 }

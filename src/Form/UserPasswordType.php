@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\DTO\UpdateUser;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -17,13 +18,11 @@ class UserPasswordType extends AbstractType
     {
         $builder
             ->add('oldPlainPassword', PasswordType::class,[
-                'mapped' => false,
                 'required'=>true,
                 'attr'=>['placeholder' => 'Old Password']
             ])
             ->add('newPlainPassword', RepeatedType::class,[
                 'type' => PasswordType::class,
-                'mapped' => false,
                 'invalid_message' => 'password.match',
                 'required' => true,
                 'error_bubbling' =>true,
@@ -46,7 +45,7 @@ class UserPasswordType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => User::class,
+            'data_class' => UpdateUser::class,
         ]);
     }
 }

@@ -25,14 +25,14 @@
                     </div>
                     <div class="" x-show="edit">
                         <form action="{{ url('user_role', { id: user.id,  }) }}" method="post">
-                            <select name="ROLE" onchange="this.form.submit();">
+                            <select name="updateUser[roles]" onchange="this.form.submit();">
                                 <option value="" selected disabled>Select Role</option>
                                 <option value="ROLE_ADMIN">Admin</option>
                                 <option value="ROLE_EDITOR">Editor</option>
                                 <option value="ROLE_USER">User</option>
                             </select>
-                            <input x-show="edit" type="hidden" name="token" value="{{ csrf_token('edit-role-user') }}"/>
-                            <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                            <input x-show="edit" type="hidden" name="updateUser[token]" value="{{ csrf_token('edit-role-user') }}"/>
+{#                            <input type="hidden" name="referer" value="{{ app.request.uri }}">#}
                         </form>
                     </div>
                 </td>

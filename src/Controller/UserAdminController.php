@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\DTO\UpdateUser;
 use App\Entity\User;
+use App\Form\UserRoleType;
+use App\Service\AdminManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,28 +17,35 @@ use Symfony\Component\Routing\Annotation\Route;
 #[IsGranted('ROLE_SUPER_ADMIN')]
 class UserAdminController extends AbstractController
 {
-    #[Route('/user/{id}/role', name: 'user_role', methods: ['POST'])]
-    public function editRole(User $user, EntityManagerInterface $em, Request $request): Response
+
+    public function __construct(private AdminManager $adminManager)
     {
-        $submittedToken = $request->request->get('token');
-        if ($this->isCsrfTokenValid('edit-role-user', $submittedToken)) {
-            $user->setRoles([$request->request->get('ROLE')]);
-            $em->persist($user);
-            $em->flush();
-            $this->addFlash('success', 'role.change');
-        } else {
-            $this->addFlash('failure', 'again.later');
+    }
+
+    #[Route('/user/{id}/role', name: 'user_role', methods: ['POST'])]
+    public function editRole(User $user, Request $request): Response
+    {
+        $req = $request->request->all();
+        if ($this->isCsrfTokenValid('edit-role-user', $req['updateUser']["token"])) {
+            $updateUser = new UpdateUser();
+            $form = $this->createForm(UserRoleType::class, $updateUser);
+            $form->submit($req['updateUser']);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->adminManager->roleTransferAndSave($user, $updateUser);
+                $this->addFlash('success', 'role.change');
+            } else {
+                $this->addFlash('failure', 'again.later');
+            }
         }
-        return $this->redirect($request->request->get('referer'));
+        return $this->redirectToRoute('admin_dashboard_users');
     }
 
     #[Route('/user/{id}/delete', name: 'user_delete', methods: ['POST'])]
-    public function deleteUser(User $user, EntityManagerInterface $em, Request $request)
+    public function deleteUser(User $user, Request $request)
     {
         $submittedToken = $request->request->get('token');
         if ($this->isCsrfTokenValid('delete-user', $submittedToken)) {
-            $em->remove($user);
-            $em->flush();
+            $this->adminManager->userDelete($user);
             $this->addFlash('success', 'delete.user');
         } else {
             $this->addFlash('failure', 'again.later');

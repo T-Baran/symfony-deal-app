@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Deal;
+use App\Entity\User;
 use App\Entity\Vote;
 use App\Repository\VoteRepository;
+use App\Service\VoteManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,6 +19,11 @@ use Symfony\Component\Security\Core\Security;
 #[Route('/vote')]
 class VoteController extends AbstractController
 {
+
+    public function __construct(private VoteManager $voteManager)
+    {
+    }
+
     #[Route('/up/{id}', name: 'up_vote', methods: 'POST')]
     public function upVote(Deal $deal, VoteRepository $voteRepository, EntityManagerInterface $em, Request $request, Security $security): Response
     {
@@ -27,19 +34,10 @@ class VoteController extends AbstractController
             $this->addFlash('failure', 'vote.already');
         } elseif (!empty($hasUserDownVoted)) {
             $vote = $voteRepository->find($hasUserDownVoted[0]);
-            $vote->setUpVote(true);
-            $deal->setScore($deal->getScore() + 2);
-            $em->flush();
-//            $this->addFlash('success', 'vote.successful');
+            $this->setTrueAndAdd($deal, $vote,2);
         } else {
-            $vote = new Vote();
-            $vote->setUpVote(true);
-            $vote->setDeal($deal);
-            $vote->setUser($user);
-            $deal->setScore($deal->getScore() + 1);
-            $em->persist($vote);
-            $em->flush();
-//            $this->addFlash('success', 'vote.successful');
+            $vote = $this->fillData($deal, $user);
+            $this->setTrueAndAdd($deal, $vote, 1);
         }
         return $this->redirect($request->request->get('referer'));
     }
@@ -54,20 +52,34 @@ class VoteController extends AbstractController
             $this->addFlash('failure', 'vote.already');
         } elseif (!empty($hasUserUpVoted)) {
             $vote = $voteRepository->find($hasUserUpVoted[0]);
-            $vote->setUpVote(false);
-            $deal->setScore($deal->getScore() - 2);
-            $em->flush();
-//            $this->addFlash('success', 'vote.successful');
+            $this->setFalseAndSub($deal, $vote, 2);
         } else {
-            $vote = new Vote();
-            $vote->setUpVote(false);
-            $vote->setDeal($deal);
-            $vote->setUser($user);
-            $deal->setScore($deal->getScore() - 1);
-            $em->persist($vote);
-            $em->flush();
-//            $this->addFlash('success', 'vote.successful');
+            $vote = $this->fillData($deal, $user);
+            $this->setFalseAndSub($deal, $vote, 1);
         }
         return $this->redirect($request->request->get('referer'));
     }
+
+    public function setTrueAndAdd(Deal $deal, Vote $vote, int $value)
+    {
+        $vote->setUpVote(true);
+        $deal->setScore($deal->getScore() + $value);
+        $this->voteManager->save($vote);
+    }
+
+    public function setFalseAndSub(Deal $deal, Vote $vote, int $value)
+    {
+        $vote->setUpVote(false);
+        $deal->setScore($deal->getScore() - $value);
+        $this->voteManager->save($vote);
+    }
+
+    public function fillData(Deal $deal, User $user):Vote
+    {
+        $vote = new Vote();
+        $vote->setDeal($deal);
+        $vote->setUser($user);
+        return $vote;
+    }
+
 }

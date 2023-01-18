@@ -21,9 +21,9 @@
                     <p x-show="!edit" class="text-wrap text-break w-100">{{ comment.content }}</p>
                     <form action="{{ url('comment_edit', { id: comment.id,  }) }}" method="POST" x-show="edit"
                           class="d-flex gap-2 w-100">
-                        <input x-show="edit" type="text" name="content" value="{{ comment.content }}" class="w-75">
-                        <input x-show="edit" type="hidden" name="token" value="{{ csrf_token('edit-comment') }}"/>
-                        <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                        <input x-show="edit" type="text" name="comment[content]" value="{{ comment.content }}" class="w-75">
+                        <input x-show="edit" type="hidden" name="comment[token]" value="{{ csrf_token('comment') }}"/>
+                        <input type="hidden" name="comment[referer]" value="{{ app.request.uri }}">
                         <button x-show="edit" class="btn btn-success w-25">Update</button>
                     </form>
                 </td>
@@ -37,7 +37,7 @@
                         <form action="{{ url('comment_delete', {id:comment.id}) }}" method="post" class="">
                             <button type="submit" class="btn btn-danger">Delete</button>
                             <input type="hidden" name="referer" value="{{ app.request.uri }}">
-                            <input type="hidden" name="token" value="{{ csrf_token('delete-comment') }}">
+                            <input type="hidden" name="token" value="{{ csrf_token('comment') }}">
                         </form>
                     </td>
                 {% else %}

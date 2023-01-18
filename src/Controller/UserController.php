@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use App\DTO\UpdateUser;
 use App\Form\UserEmailType;
 use App\Form\UserPasswordType;
 use App\Form\UserUsernameType;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\UserManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,21 +17,23 @@ use Symfony\Component\Security\Core\Security;
 
 class UserController extends AbstractController
 {
+    public function __construct(private UserManager $userManager, private Security $security, private UserPasswordHasherInterface $passwordHasher)
+    {
+    }
+
     #[Route('/user', name: 'user_menu')]
-    public function index(Security $security, Request $request, EntityManagerInterface $em): Response
+    public function index(Security $security): Response
     {
         $user = $security->getUser();
-        $formEmail = $this->createForm(UserEmailType::class, $user, [
+        $updateUser = $this->prepareData();
+        $formEmail = $this->createForm(UserEmailType::class, $updateUser, [
             'action' => $this->generateUrl('user_email'),
-            'method' => 'PATCH'
         ]);
-        $formUsername = $this->createForm(UserUsernameType::class, $user, [
+        $formUsername = $this->createForm(UserUsernameType::class, $updateUser, [
             'action' => $this->generateUrl('user_username'),
-            'method' => 'PATCH'
         ]);
-        $formPassword = $this->createForm(UserPasswordType::class, $user, [
+        $formPassword = $this->createForm(UserPasswordType::class, $updateUser, [
             'action' => $this->generateUrl('user_password'),
-            'method' => 'PATCH'
         ]);
 
         return $this->renderForm('user/index.html.twig', [
@@ -42,66 +45,108 @@ class UserController extends AbstractController
     }
 
     #[Route('/user/username', name: 'user_username', methods: ['POST'])]
-    public function editUsername(Security $security, Request $request, EntityManagerInterface $em): Response
+    public function editUsername(Request $request): Response
     {
-        $user = $security->getUser();
-        $this->denyAccessUnlessGranted('EDIT', $user);
-        $formUsername = $this->createForm(UserUsernameType::class, $user);
-        $formUsername->handleRequest($request);
-        if ($formUsername->isSubmitted() && $formUsername->isValid()) {
-            $em->flush();
-            $this->addFlash('success', 'update.username');
-        } else {
-            $this->printErrors($formUsername);
-        }
-        return $this->redirectToRoute('user_menu');
+        $this->validatePermission();
+        return $this->saveCredentials($request, "username");
     }
 
     #[Route('/user/email', name: 'user_email', methods: ['POST'])]
-    public function editEmail(Security $security, Request $request, EntityManagerInterface $em): Response
+    public function editEmail(Request $request): Response
     {
-        $user = $security->getUser();
-        $this->denyAccessUnlessGranted('EDIT', $user);
-        $formEmail = $this->createForm(UserEmailType::class, $user);
-        $formEmail->handleRequest($request);
-        if ($formEmail->isSubmitted() && $formEmail->isValid()) {
-            $em->flush();
-            $this->addFlash('success', 'update.email');
-        } else {
-            $this->printErrors($formEmail);
-        }
-        return $this->redirectToRoute('user_menu');
+        $this->validatePermission();
+        return $this->saveCredentials($request, "email");
     }
 
     #[Route('/user/password', name: 'user_password', methods: ['POST'])]
-    public function editPassword(Security $security, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
+    public function editPassword(Request $request): Response
     {
-        $user = $security->getUser();
-        $this->denyAccessUnlessGranted('EDIT', $user);
-        $formPassword = $this->createForm(UserPasswordType::class, $user);
-        $formPassword->handleRequest($request);
-        if ($formPassword->isSubmitted() && $formPassword->isValid()) {
-            $oldPassword = $formPassword['oldPlainPassword']->getData();
-            if ($passwordHasher->isPasswordValid($user, $oldPassword)) {
-                $newPassword = $formPassword['newPlainPassword']->getData();
-                $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
-                $user->setPassword($hashedPassword);
-                $em->flush();
-                $this->addFlash('success', 'update.password');
-            } else {
-                $this->addFlash('failure', 'password.wrong');
-            }
-        } else {
-            $this->printErrors($formPassword);
+        $this->validatePermission();
+        return $this->saveCredentials($request, "password");
+    }
 
+    private function saveCredentials(Request $request, string $subject): Response
+    {
+        $updateUser = new UpdateUser();
+        switch($subject){
+            case "email":
+                $form = $this->createForm(UserEmailType::class, $updateUser);
+                break;
+            case "username":
+                $form = $this->createForm(UserUsernameType::class, $updateUser);
+                break;
+            case "password":
+                $form = $this->createForm(UserPasswordType::class, $updateUser);
+                break;
+            default:
+                return $this->redirectToRoute('user_menu');
+        }
+//        if ($subject === "email") {
+//            $form = $this->createForm(UserEmailType::class, $updateUser);
+//        } elseif ($subject === "username") {
+//            $form = $this->createForm(UserUsernameType::class, $updateUser);
+//        } else {
+//            $form = $this->createForm(UserPasswordType::class, $updateUser);
+//        }
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($subject === "password") {
+                $oldPassword = $updateUser->oldPlainPassword;
+                if (!$this->validatePassword($oldPassword)) {
+                    $this->addFlash('failure', 'password.wrong');
+                    return $this->redirectToRoute('user_menu');
+                }
+            }
+            $this->userManager->transferAndSave($updateUser, $subject);
+            switch($subject){
+                case "email":
+                    $this->addFlash('success', "update.email");
+                    break;
+                case "username":
+                    $this->addFlash('success', "update.username");
+                    break;
+                case "password":
+                    $this->addFlash('success', 'update.password');
+                    break;
+            }
+//            if ($subject === "email") {
+//                $this->addFlash('success', "update.email");
+//            } elseif ($subject === "username") {
+//                $this->addFlash('success', "update.username");
+//            } else {
+//                $this->addFlash('success', 'update.password');
+//            }
+        } else {
+            $this->printErrors($form);
         }
         return $this->redirectToRoute('user_menu');
     }
 
-    public function printErrors(FormInterface $form): void
+    private function printErrors(FormInterface $form): void
     {
-        foreach ($form->getErrors() as $error) {
+        foreach ($form->getErrors(true) as $error) {
             $this->addFlash('failure', $error->getMessage());
         }
+    }
+
+    private function prepareData(): UpdateUser
+    {
+        $updateUser = new UpdateUser();
+        $user = $this->security->getUser();
+        $updateUser->email = $user->getEmail();
+        $updateUser->username = $user->getUsername();
+        return $updateUser;
+    }
+
+    public function validatePermission(): void
+    {
+        $user = $this->security->getUser();
+        $this->denyAccessUnlessGranted('EDIT', $user);
+    }
+
+    private function validatePassword($password): bool
+    {
+        $user = $this->security->getUser();
+        return $this->passwordHasher->isPasswordValid($user, $password);
     }
 }

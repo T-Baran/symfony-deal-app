@@ -97,7 +97,7 @@
                                     <form action="{{ url('comment_delete', { id: comment.id,  }) }}" method="POST"
                                           class="d-flex align-items-center">
                                         <button type="submit" class="badge bg-danger border-0">Delete</button>
-                                        <input type="hidden" name="token" value="{{ csrf_token('delete-comment') }}">
+                                        <input type="hidden" name="token" value="{{ csrf_token('comment') }}">
                                         <input x-show="edit" type="hidden" name="referer" value="{{ app.request.uri }}">
                                     </form>
                                 {% endif %}
@@ -107,9 +107,9 @@
                         <p class="p-3" x-show="!edit">{{ comment.content }} </p>
                         <form action="{{ url('comment_edit', { id: comment.id,  }) }}" method="POST" x-show="edit"
                               class="d-flex flex-column gap-2 ">
-                            <input x-show="edit" type="text" name="content" value="{{ comment.content }}">
-                            <input x-show="edit" type="hidden" name="token" value="{{ csrf_token('edit-comment') }}"/>
-                            <input x-show="edit" type="hidden" name="referer" value="{{ app.request.uri }}">
+                            <input x-show="edit" type="text" name="comment[content]" value="{{ comment.content }}">
+                            <input x-show="edit" type="hidden" name="comment[token]" value="{{ csrf_token('comment') }}"/>
+                            <input x-show="edit" type="hidden" name="comment[referer]" value="{{ app.request.uri }}">
                             <button x-show="edit" class="btn btn-success mb-5">Update</button>
                         </form>
                     </div>
@@ -121,9 +121,9 @@
                     <form x-show="open" action="{{ url('comment_create', { id: deal.id }) }}" method="post">
                         <div class="form-group d-flex gap-3 flex-column mb-4">
                             <label for="comment">Your comment:</label>
-                            <input type="text" name="content" class="form-control" id="comment">
-                            <input type="hidden" name="token" value="{{ csrf_token('create-comment') }}"/>
-                            <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                            <input type="text" name="comment[content]" class="form-control" id="comment">
+                            <input type="hidden" name="comment[token]" value="{{ csrf_token('comment') }}"/>
+{#                            <input type="hidden" name="referer" value="{{ app.request.uri }}">#}
                             <button class="btn btn-success">Add</button>
                         </div>
                     </form>
