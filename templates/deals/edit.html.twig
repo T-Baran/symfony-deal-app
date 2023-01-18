@@ -8,7 +8,6 @@
         {{ form_start(form) }}
         {{ form_widget(form) }}
         <button type="submit" class="btn btn-success">Update</button>
-        <input type="hidden" name="referer" value="{{ app.request.headers.get('referer')|default('/') }}"/>
         {{ form_end(form) }}
     </div>
 {% endblock %}

@@ -27,7 +27,12 @@
                 <td class="text-wrap text-break">{{ deal.description }}</td>
                 <td>{{ deal.createdAt|ago }}</td>
                 <td>{{ deal.user.username }}</td>
-                <td><a href="{{ path('deal_edit', {id: deal.id}) }}" class="btn btn-warning">Edit</a></td>
+                <td data-turbo="false">
+                    <form action="{{ url('deal_edit',{id:deal.id}) }}" method="post">
+                        <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                        <button class="btn btn-warning">Edit</button>
+                    </form>
+                </td>
                 {% if is_granted('DELETE', deal) %}
                     <td>
                         <form action="{{ url('deal_delete', {id:deal.id}) }}" method="post" class="">

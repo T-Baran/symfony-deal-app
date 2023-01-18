@@ -15,7 +15,10 @@
                 {% endif %}
                 <div class="d-flex gap-5">
                     {% if is_granted('EDIT', deal) %}
-                        <a href="{{ path('deal_edit', {id: deal.id}) }}" class="btn btn-sm btn-info w-100">Edit</a>
+                        <form action="{{ url('deal_edit',{id:deal.id}) }}" method="post" class="w-100" data-turbo="false">
+                                <input type="hidden" name="referer" value="{{ app.request.uri }}">
+                                <button class="btn btn-sm btn-info w-100">Edit</button>
+                            </form>
                     {% endif %}
                     {% if is_granted('DELETE', deal) %}
                         <form action="{{ url('deal_delete', {id:deal.id}) }}" method="post" class="w-100">

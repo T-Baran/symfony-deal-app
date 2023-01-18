@@ -55,7 +55,7 @@ class DealsController extends AbstractController
     {
         $this->denyAccessUnlessGranted('EDIT', $deal);
         $form = $this->createForm(DealType::class, $deal);
-
+        $this->setReferer($request);
         return $this->addUpdate($deal, $request, false) ?? $this->renderForm('deals/edit.html.twig', [
             'form' => $form,
         ]);
@@ -131,9 +131,6 @@ class DealsController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $session = $request->getSession();
-            if (!$isNew && !str_contains($request->request->get('referer'), '/edit/')) {
-                $session->set('referer', $request->request->get('referer'));
-            }
             if ($deal->getPrice() > $deal->getPriceBefore()) {
                 $this->addFlash('failure', 'before.lower');
                 if ($isNew) {
@@ -149,6 +146,15 @@ class DealsController extends AbstractController
             }
             $this->addFlash('success', 'add.deal');
             return $this->redirectToRoute('deals');
+        }
+    }
+
+    private function setReferer(Request $request):void
+    {
+        $referer = $request->request->get('referer');
+        if($referer){
+            $session = $request->getSession();
+            $session->set('referer', $referer);
         }
     }
 }
